@@ -1,0 +1,278 @@
+/*
+    SkyApp Bootstrap Sass Theme
+    Author: Brad Trayersy
+    Vsersion: 0.0.1
+*/
+/* BASE - Base styles, variables, minins, etc */
+/* front colors */
+/* background colors*/
+/* showcase area */
+/* Mixins */
+h1, h2, h3, h4, h5 {
+  margin-top: 0;
+}
+
+.page-header {
+  margin-top: 30px;
+}
+
+.no-pad-top {
+  padding-top: 0;
+}
+
+.extra-pad {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.top-inner {
+  padding: 90px 0 30px 0;
+}
+
+body {
+  font-family: "Segoe UI", "Segoe WP", "Segoe Regular", sans-serif;
+  font-size: 15px;
+  line-height: 1.7em;
+  color: #666666;
+}
+
+a {
+  color: #00aff0;
+}
+
+ul, li {
+  list-style: none;
+}
+
+input, textarea, button {
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+}
+
+img.device {
+  width: 100%;
+}
+
+/* MODULES - Individual site components */
+/* lists */
+.list, .list-feature {
+  margin-bottom: 30px;
+}
+
+.list-feature {
+  margin: 0;
+  padding: 0;
+  width: 80%;
+}
+.list-feature li {
+  line-height: 3.2em;
+  border-bottom: 1px solid #cccccc;
+}
+.list-feature li:last-child {
+  border: 0;
+}
+.list-feature span {
+  vertical-align: top;
+  padding-top: 9px;
+  font-size: 120%;
+}
+.list-feature i {
+  margin-top: -2px;
+  margin-right: 5px;
+}
+
+/* icon */
+.fa-primary {
+  color: #00aff0;
+}
+
+.fa-border {
+  border: 1px solid #00aff0;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 13px 15px;
+  width: 70px;
+  margin-bottom: 10px;
+}
+
+/* heading */
+.heading-primary {
+  color: #00aff0;
+}
+
+.heading-secondary {
+  color: #7fba00;
+}
+
+.heading-light {
+  color: #e4eef2;
+}
+
+.heading-dark {
+  color: #2b5464;
+}
+
+/* blocks */
+.block, .block-primary, .block-secondary, .block-light, .block-dark {
+  padding: 15px;
+  margin-bottom: 15px;
+}
+.block h3, .block-primary h3, .block-secondary h3, .block-light h3, .block-dark h3 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.block-primary {
+  background: #00aff0;
+  color: #ffffff;
+}
+
+.block-secondary {
+  background: #7fba00;
+  color: #ffffff;
+}
+
+.block-light {
+  background: #e4eef2;
+  color: #666666;
+}
+
+.block-dark {
+  background: #2b5464;
+  color: #ffffff;
+}
+
+.block-center {
+  text-align: center !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background: #00aff0;
+  color: #ffffff;
+  border: 2px solid white;
+}
+
+.btn-primary:hover {
+  background: #00658a;
+  border: 2px solid white;
+}
+
+/* sections */
+section {
+  padding: 30px 0px 0px 0px;
+}
+
+.section-showcase {
+  height: 400px;
+  background: url("../img/showcase.jpg") no-repeat top center;
+}
+.section-showcase .showcase-content {
+  padding: 90px 15px;
+  text-align: center;
+}
+.section-showcase h1 {
+  color: #00aff0;
+}
+
+.section-primary, .section-primary-a {
+  background: #00aff0;
+  color: #ffffff;
+}
+
+.section-primary-a {
+  border-top: 4px solid #7fba00;
+}
+
+.section-secondary {
+  background: #7fba00;
+  color: #ffffff;
+}
+
+.section-light {
+  background: #e4eef2;
+  color: #666666;
+}
+
+.section-dark {
+  background: #2b5464;
+  color: #ffffff;
+}
+
+/* search box */
+.search {
+  width: 100%;
+}
+.search h3 {
+  margin-top: 0;
+  padding-top: 0;
+}
+.search input[type="search"] {
+  border: 0;
+  height: 50px;
+  width: 80%;
+  border: 2px solid #00aff0;
+  font-size: 18px;
+  padding-left: 10px;
+  padding-bottom: 5px;
+}
+.search button {
+  border: 0;
+  background: none;
+  padding: 0;
+  vertical-align: top;
+  margin-left: -4px;
+}
+
+/* LAYOUTS - Page layout styles */
+/* NavBar */
+.navbar {
+  width: 90%;
+  margin: auto;
+  border-color: #d58512;
+  border-left: 1px solid #e7e7e7;
+  border-right: 1px solid #e7e7e7;
+  min-height: 60px;
+  background: #fff;
+  margin-bottom: 30px;
+}
+.navbar a {
+  color: #00aff0;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  padding-bottom: 24px;
+  padding-top: 15px;
+}
+
+.navbar-inverse .navbar-brand:hover {
+  color: #00aff0;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus,
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  color: #fff;
+  background-color: #00aff0;
+}
+
+/* Footer */
+.footer-main {
+  background: #2b5464;
+  color: #ffffff;
+  border-top: 5px solid #7fba00;
+  min-height: 200px;
+  padding: 30px 0;
+  z-index: 100;
+}
+.footer-main a {
+  color: #ffffff;
+}
+.footer-main ul {
+  margin: 0;
+  padding: 0;
+}
+.footer-main li {
+  line-height: 1.5em;
+  list-style: none;
+}

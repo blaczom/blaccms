@@ -1,0 +1,54 @@
+npm install -g gulp-sass
+
+> v8flags@1.0.5 install C:\Users\Administrator\AppData\Roaming\npm\node_modules\
+gulp\node_modules\v8flags
+> node fetch.js
+flags for v8 3.14.5.9 cached.
+C:\Users\Administrator\AppData\Roaming\npm\gulp -> C:\Users\Administrator\AppDat
+a\Roaming\npm\node_modules\gulp\bin\gulp.js
+gulp@3.8.10 C:\Users\Administrator\AppData\Roaming\npm\node_modules\gulp
+
+使用npm install -g 'xxx' 之后仍然报 
+Cannot find module 'xxx' 错误，可以通过设置环境变量来解决； 
+$NODE_PATH=/usr/local/lib/node_modules/  
+
+Windows环境下, 通过 npm install -g 安装的全局模块, 可能无法在app中被require引用到, 怎么办?其实, 只要设置环境变量 NODE_PATH 指向全局模块根目录即可. 我的解决方法是:
+我的电脑->属性-> 高级-> 环境变量, 添加一个环境变量名为 NODE_PATH , 将其值设置为全局模块的根目录. 我这里这个目录是: C:\Documents and Settings\Administrator\Application Data\npm\node_modules --------- 搞定。
+
+npm config get prefix 
+C:\Users\Administrator\AppData\Roaming\npm
+最后在nodejs的安装目录中找到node_modules\npm\.npmrc文件
+修改如下即可：
+prefix = D:\nodejs\node_global
+cache = D:\nodejs\node_global
+
+var gulp = require('gulp');
+var sass = require('gulp-sass');
+
+gulp.task('sass',function(){gulp.src('./scss/main.scss').pipe(sass()).pipe(gulp.dest('./css'));});
+
+==========================
+npm install node-sass
+var sass = require('node-sass');
+sass.render({
+    file: scss_filename,
+    success: callback
+    [, options..]
+    });
+// OR
+var css = sass.renderSync({
+    data: scss_content
+    [, options..]
+});
+
+=========================  依然没有进展。应该能用，但是我搞不定~~ 改用 scout
+安装adobe air。然后安scout，运行错误。百度竟然是判断js的错误。
+
+nuVoid commented on 13 Dec 2011
+I fixed the problem on Win7 x64 by editing [ScoutInstallDir]\javascripts\app\process_interaction.js and changing line 95 to contain a correct path to java.exe (I already had a JRE installed even though it is nowhere in the requirements, but it was a 32bit version for which the default path provided by Scout is incorrect on a 64bit OS).
+Now everything runs as advertised.
+改了以后好了。
+      path = air.File.applicationDirectory.resolvePath("C:\\Program Files\\Java\\jdk1.8.0_20\\bin\\java.exe");
+
+
+
