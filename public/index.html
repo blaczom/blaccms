@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+
+    <!-- compiled css output -->
+    <link href="css/ionic.app.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+    <!-- your app's js -->
+
+      <script src="/js/angular-md5.min.js"></script>
+
+      <script src="/js/app.js"></script>
+      <script src="/js/controllers.js"></script>
+      <script src="/js/services.js"></script>
+      <script src="/js/exWebSqlDb.js"></script>
+      <script src="/js/exTest.js"></script>  <!-- 自动测试js -->
+
+  </head>
+  <body ng-app="exManic" animation="slide-left-right-ios7">
+    <!-- 
+      The nav bar that will be updated as we navigate between views.
+    -->
+    <ion-nav-bar class="bar-stable nav-title-slide-ios7">
+      <ion-nav-back-button class="button-icon icon  ion-ios7-arrow-back">
+        Back&nbsp; &nbsp;
+      </ion-nav-back-button>
+      <div  class="buttons" >
+        <button class="button icon ion-navicon"></button>
+      </div>
+
+      <h1 class="title">&nbsp;</h1>
+      <div class="buttons" ng-controller="indexTitleRightCtrl">
+          <button class="button button-clear button-positive">Edit2</button>
+          <span ng-bind="loginUser.name" ></span>
+        <button class="button" >Right Button</button>
+        <div class="button-bar">
+          <a class="button">First</a>
+          <a class="button">Second</a>
+          <a class="button">Third</a>
+        </div>
+      </div>
+    </ion-nav-bar>
+
+    <ion-nav-view></ion-nav-view>
+  </body>
+</html>
+
+
+
