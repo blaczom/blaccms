@@ -1,28 +1,17 @@
-/* NavBar */
 
-.navbar{
-  width:90%;
-  margin:auto;
-  border-color: #d58512;
-  @include add-border(1px, #e7e7e7, 'right-left');
-  min-height: 60px;
-  background:#fff;
-  margin-bottom:30px;
-
-  a{
-    color:$primary-color;
-    font-size:20px;
-    letter-spacing:-0.5px;
-    padding-bottom: 24px;
-    padding-top:15px;
-  }
-
+/* 鼠标悬停就弹出二级菜单*/
+.move-show{
+  display:none;
 }
 
-.navbar-inverse .navbar-brand:hover { color: $primary-color; }
-.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus,
-.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
-  color: #fff;
-  background-color: $primary-color;
+.move-navi > span .dropdown-menu {
+  margin: 0;
+}
+.move-navi > div:hover .move-show {
+  z-index:100;
+  display:block;
 }
 
+.move-navi > span:hover{
+  @include add-background($secondary-color);
+}

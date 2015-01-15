@@ -2,30 +2,60 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title>xxx的title</title>
-
+    <title>黑小巫的通用门户网站</title>
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/font-awesome.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
 
-    <script src="js/bootstrap.js"></script>
-    <script src="js/jquery18.js"></script>
-    <script src="js/angular13.js"></script>
-    <script src="js/angular-sanitize.js"></script>
-    <script src="js/angular-ui-router.js"></script>
-    <script src="js/angular-md5.min.js"></script>
-
-    <script src="/js/app.js"></script>
-    <script src="/js/services.js"></script>
-
   </head>
-  <body ng-app="blacapp">
+  <body>
+
+        <div class="block">
+          there is a img to show the website;
+        </div>
+
+        <div class="container">
+              <div class="move-navi">
+                <div style="background-color: dodgerblue;display:inline-block;"><a href="#">Home</a></div>
+                <div style="background-color: dodgerblue;display:inline-block;"><a href="#about">About</a></div>
+                <div style="background-color: dodgerblue;display:inline-block;" ><a href="#contact">Contact</a></div>
+                <div class="move-dropdown" style="background-color: dodgerblue;display:inline-block;vertical-align:text-top;">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown </a>
+                  <ul class="move-show" style="background-color: pink; position:absolute; z-index: 999">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li><a href="#">Separated link</a></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </div>
+              </div>
+        </div>
+  <div  style="z-index: 99">this is a test . it's shouldn't going down.</div>
 
 
 
+
+
+
+
+
+
+
+  <div class="contentview" ng-view> </div>
+  </div>
   </body>
 </html>
 
+
+<script src="js/jquery11.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/angular13.js"></script>
+<script src="js/angular-sanitize.js"></script>
+<script src="js/angular-ui-router.js"></script>
+<script src="js/angular-md5.js"></script>
+
+<script src="/js/app.js"></script>
+<script src="/js/services.js"></script>
 
 

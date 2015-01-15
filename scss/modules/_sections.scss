@@ -29,7 +29,7 @@ section{
 
 .section-primary-b{
   @extend  .section-primary;
-  @include add-borer(4px, $secondary-color, bottom);
+  @include add-border(4px, $secondary-color, bottom);
 }
 
 
