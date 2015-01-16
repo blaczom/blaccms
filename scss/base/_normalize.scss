@@ -26,3 +26,43 @@ h1,h2,h3,h4,h5{
 .color-secondary{
   @include add-background($secondary-color);
 }
+
+.align-center{
+  text-align: center !important;
+}
+
+.max-width{
+  width: $body-width !important;
+}
+
+.border-all {
+  @include add-border(1px, lightgrey, all);
+}
+.border-allthick {
+  @include add-border(5px, white, all);
+}
+.border-bottom{
+  @include add-border(4px, lightgrey, bottom);
+}
+
+.topgrey-background {
+  @include add-background(#e5e5e5);
+}
+
+.primary-color {
+  color: #00aff0;
+}
+
+/* 面板的标题字段的底色 */
+.panel>.panel-heading {
+  color: white;
+  background-color: $navi-background;
+  border-color: #ddd;
+}
+/* 面板列表的标题字段的底色 */
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+  z-index: 2;
+  color: #fff;
+  background-color: $navi-background;
+  border-color: $navi-background;
+}

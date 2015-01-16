@@ -1,7 +1,7 @@
 /* lists */
 
 .list{
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .list-feature{
@@ -11,8 +11,7 @@
   width:80%;
 
   li{
-    line-height:3.2em;
-    @include add-border(1px,#cccccc, bottom);
+    line-height:1.8em;
   }
 
   li:last-child{

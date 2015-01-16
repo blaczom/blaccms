@@ -27,10 +27,13 @@
 
 
 @mixin add-background($color){
-  background: $color;
+  background-color: $color;
   @if $color == $light-color {
     color:#666666;
-  } @else {
+  } @else if $color == #ffffff {
+    color:blue;
+  }
+  @else {
     color:#ffffff;
   }
 }
