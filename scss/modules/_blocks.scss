@@ -34,3 +34,21 @@
 .block-shadow {
   box-shadow: 6px 6px 12px #888888;
 }
+
+.block-bottom{
+  @include add-border(1px, lightgrey, bottom)
+}
+
+.block-border-all{
+  @include add-border(1px, lightgrey, all)
+}
+
+
+.post-meta {
+  background: #f3f3f3;
+  paddnig: 10px 10px 5px 10px;
+  border: 1px solid #cccccc;
+  margin-bottom: 10px;
+  height:30px;
+  line-height: 30px;
+}
