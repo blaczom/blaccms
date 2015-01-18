@@ -1,0 +1,21 @@
+/* Footer */
+
+.footer-main{
+  color: #ffffff;
+  background-color: $navi-background;
+  @include add-border(5px, $secondary-color, top);
+  min-height: 60px;
+  padding: 10px 10px;
+  a{
+    color:#ffffff;
+  }
+  ul{
+    margin:0;
+    padding:0;
+  }
+  li{
+    line-height:1.5em;
+    list-style:none;
+  }
+
+}

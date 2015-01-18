@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html ng-app="blacapp">
+<head>
+  <meta charset="utf-8">
+  <title>黑小巫的通用门户网站</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="acfile/main.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <div class="head">
+      <div class="headNav" ng-controller="ctrladmin">
+        <span class="headNavItem"><a ui-sref="top">任 务 </a> &nbsp; </span>
+        <span class="headNavItem"><a href="#/workList/navi"> 工 作 </a> &nbsp;</span>
+        <span class="headNavItem"><a href="#/userList/navi"> 用 户 </a> &nbsp;</span>
+        <span class="headNavItem"><a href="#/taskAll/navi"> 任务梯次 </a> &nbsp;</span>
+        <span class="headNavItem"><a ui-sref="login"> 登 录 </a> &nbsp;&nbsp;</span>
+        <a href="#/change"><span ng-bind="currentUser?currentUser:'未登录'" ></span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div ui-view class="max-width" style="margin-left: -15px;"></div>
+
+  <div class="row">
+    <footer class="footer-main">
+      <div class="col-xs-4 col-xs-offset-4" style="text-align: center;">
+        <span class = "footItem"> -- xxx@xxx.com -- </span>
+      </div>
+    </footer>
+  </div> <!-- row -->
+
+
+</body>
+</html>
+<script src="js/jquery11.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/angular13.js"></script>
+<script src="js/angular-sanitize.js"></script>
+<script src="js/angular-ui-router.js"></script>
+<script src="js/angular-md5.js"></script>
+<script src="acfile/blac-app.js"></script>
