@@ -8,31 +8,42 @@
 </head>
 <body>
 
-<div class="container">
-  <div class="row">
-    <div class="head">
-      <div class="headNav" ng-controller="ctrladmin">
-        <span class="headNavItem"><a ui-sref="top">任 务 </a> &nbsp; </span>
-        <span class="headNavItem"><a href="#/workList/navi"> 工 作 </a> &nbsp;</span>
-        <span class="headNavItem"><a href="#/userList/navi"> 用 户 </a> &nbsp;</span>
-        <span class="headNavItem"><a href="#/taskAll/navi"> 任务梯次 </a> &nbsp;</span>
-        <span class="headNavItem"><a ui-sref="login"> 登 录 </a> &nbsp;&nbsp;</span>
-        <a href="#/change"><span ng-bind="currentUser?currentUser:'未登录'" ></span></a>
-      </div>
+<nav class="navbar" style="margin-bottom:0px;" role="navigation">
+  <div class="container-fluid" style="background: #00aff0" ng-controller="ctrlAdmin">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" style="color:white " href="#">黑小巫管理后台 {{loginedUser}}</a>
+    </div>
+
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">前台首页</a></li>
+        <li><a ui-sref="login">系统设置</a></li>
+        <li><a ui-sref="login">管理员选项</a></li>
+      </ul>
+      <form class="navbar-form navbar-right">
+        <input type="text" class="form-control" placeholder="Search...">
+      </form>
     </div>
   </div>
-</div>
+</nav>
 
-  <div ui-view class="max-width" style="margin-left: -15px;"></div>
+  <div ui-view></div>
 
+<div class="container-fluid">
   <div class="row">
-    <footer class="footer-main">
+    <footer class="footer-main" >
       <div class="col-xs-4 col-xs-offset-4" style="text-align: center;">
         <span class = "footItem"> -- xxx@xxx.com -- </span>
       </div>
     </footer>
   </div> <!-- row -->
-
+</div>
 
 </body>
 </html>
@@ -42,4 +53,6 @@
 <script src="js/angular-sanitize.js"></script>
 <script src="js/angular-ui-router.js"></script>
 <script src="js/angular-md5.js"></script>
+
+<script src="acfile/blac-util.js"></script>
 <script src="acfile/blac-app.js"></script>

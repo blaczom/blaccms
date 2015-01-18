@@ -1,9 +1,9 @@
 /**
  * Created by Administrator on 2015/1/15.
  */
-var myApp = angular.module('blacapp', ['ui.router']);
+var app = angular.module('blacapp', ['ui.router', 'blac-util']);
 
-myApp.config(function($stateProvider, $urlRouterProvider) {
+app.config(function($stateProvider, $urlRouterProvider) {
   //
   // For any unmatched url, redirect to /state1
   $urlRouterProvider.otherwise("/login");
@@ -36,30 +36,26 @@ myApp.config(function($stateProvider, $urlRouterProvider) {
     });
 });
 
-app.controller("ctrlAdmin",function($scope,$location,exStore,exUtil) {
+app.controller("ctrlAdmin",function($scope,blacStore,blacAccess) {
   var lp = $scope;
-  lp.currentUser = exStore.getUser().name;
-  lp.$on('event:login', function(){
-    lp.currentUser = exStore.getUser().name;
-    exUtil.shareCache.ctrlStateCache = {}; // 清空。。。
+  lp.$on(blacAccess.gEvent.login, function(){
+    lp.loginedUser = blacStore.localUser();
   });
 });
-app.controller("ctrlLogin",function($rootScope,$scope,$location,exStore,exAccess) {
+
+app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAccess) {
   var lp = $scope;
   lp.rtnInfo = "";
-  lp.l_logUser = exStore.getUserList();   // 下拉菜单用户名。
-  lp.l_tmpUser = exStore.getUser();       // 当前用户
+  lp.lUser = {rem:blacStore.localRem(), name:blacStore.localUser(), word:blacStore.localWord()  }
 
   lp.userLogin = function () {
-    lp.user = exAccess.USER.newUser();
-    lp.user.NICKNAME = lp.l_tmpUser.name;
-    lp.user.REMPASS = lp.l_tmpUser.rempass;
-    lp.user.PASS = lp.l_tmpUser.pass;
-    exAccess.userLoginPromise(lp.user).then( function(data) {
+    blacAccess.userLoginQ(lp.lUser).then( function(data) {
       if (data.rtnCode > 0) {
-        exStore.setUserList(lp.user.NICKNAME, lp.user.PASS, lp.user.REMPASS );
-        $rootScope.$broadcast('event:login');
-        $location.path('/taskList/main');
+        blacStore.localUser(lp.lUser.name);
+        blacStore.localWord(lp.lUser.word);
+        blacStore.localRem(lp.lUser.rem);
+        $rootScope.$broadcast(blacAccess.gEvent.login);
+        $location.path('/');
       }
       else{
         lp.rtnInfo = data.rtnInfo;

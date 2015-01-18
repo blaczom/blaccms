@@ -6,58 +6,42 @@ var sqlite3 = require('sqlite3');
 var ex = require('./blac-bk-util.js');
 var fs = require('fs');
 var Q = require('q');
-var gdbFile = 'exman.db'; // if exist exman.db, means the sql ddl have been execute.
+var gdbFile = 'blaccms.db'; // if exist exman.db, means the sql ddl have been execute.
 
 var logInfo = ex.info;
 var logErr = ex.err;
 
-if (!fs.existsSync(gdbFile)){
-  logInfo("---no databse file. will create it:---", gdbFile);
-  var l_run = [];
-  l_run.push( "CREATE TABLE if not exists USER(NICKNAME NVARCHAR2(32) NOT NULL PRIMARY KEY, " +
-    " PASS CHAR(32) NOT NULL, REMPASS BOOLEAN, MOBILE NVARCHAR2(20), EMAIL NVARCHAR2(80), IDCARD NVARCHAR2(32), " +
-    " UPUSER NVARCHAR2(32), LEVEL INTEGER, GRANT INTEGER, SYNC BOOLEAN  ) WITHOUT ROWID;"   );
+var createDB = function(gdbFile){
+  if (!fs.existsSync(gdbFile)){
+    logInfo("---no databse file. will create it:---", gdbFile);
+    var l_run = [];
+    l_run.push( "CREATE TABLE if not exists USER(NAME NVARCHAR2(32) NOT NULL PRIMARY KEY, " +
+      " WORD CHAR(32) NOT NULL, REM BOOLEAN, MOBILE NVARCHAR2(20), EMAIL NVARCHAR2(80), IDCARD NVARCHAR2(32), " +
+      " UPUSER NVARCHAR2(32), LEVEL INTEGER) WITHOUT ROWID;"   );
+    l_run.push("CREATE INDEX if not exists [idx_user_name] ON [USER] ([NAME] ASC);");
 
-  l_run.push("CREATE TABLE if not exists TASK(UUID CHAR(32) NOT NULL PRIMARY KEY, UPTASK CHAR(32), PLANSTART DATETIME, " +
-    " PLANFINISH DATETIME, FINISH DATETIME, STATE NCHAR(2), OWNER NVARCHAR2(32), OUGHT NVARCHAR2(6000), " +
-    " PRIVATE BOOLEAN, CONTENT NVARCHAR2(6000), SYNC BOOLEAN ) WITHOUT ROWID;");
-  l_run.push("CREATE INDEX if not exists [idx_task_state] ON [TASK] ([STATE] ASC);");
-  l_run.push("CREATE INDEX if not exists [idx_task_owner] ON [TASK] ([OWNER] ASC);");
-  l_run.push("CREATE INDEX if not exists [idx_task_start] ON [TASK] ([PLANFINISH] DESC);");
+    l_run.push("CREATE TABLE if not exists KIND(UUID CHAR(32) NOT NULL PRIMARY KEY, UPKIND CHAR(32),   " +
+      " CONTENT NVARCHAR2(20), COMMENT NVARCHAR2(500), LEVEL INTEGER ) WITHOUT ROWID;");
+    l_run.push("CREATE INDEX if not exists [idx_kind_uuid] ON [KIND] ([UUID] DESC);");
 
-  l_run.push("CREATE TABLE if not exists WORK(UUID CHAR(32) NOT NULL PRIMARY KEY, UPTASK CHAR(32), CREATETIME DATETIME,  " +
-    " LASTMODIFY DATETIME, OWNER NVARCHAR2(32), PRIVATE BOOLEAN, LEVEL INTEGER, CONTENT NVARCHAR2(6000) ,MEMPOINT NVARCHAR2(20), " +
-    " MEMEN BOOLEAN, MEMTIMER DATETIME, STATE NCHAR(2), SYNC BOOLEAN) WITHOUT ROWID;");
-  l_run.push("CREATE INDEX if not exists [idx_work_start] ON [WORK] ([LASTMODIFY] DESC);");
-  l_run.push("CREATE INDEX if not exists [idx_work_owner] ON [WORK] ([OWNER] ASC);");
-  l_run.push("CREATE INDEX if not exists [idx_work_state] ON [WORK] ([STATE] ASC);");
-  /* 按照1,2,4,7,15,60来提醒学习。 MEMPOINT 下一个的提醒： 1，2，4，5，15，60。  " +
-   " MEMEN BOOLEAN 显示是否是记忆的需求，去掉就不再提示。MEMTIMER DATETIME:  2014-2-2 如果用户点击完了，记忆完毕：删除掉当前的记忆point，增加一个新的提醒日期
-   memen == true and memtimer < now。这是触发的一个条件。然后记忆后，pop提取mempoint的下一个节点数字。生成新的日期，写入到memtimer。
-   */
+    l_run.push("CREATE TABLE if not exists ARTICLE(UUID CHAR(32) NOT NULL PRIMARY KEY, KIND CHAR(32),   " +
+      "IMGLINK NVARCHAR2(1000), VIDEOLINK NVARCHAR2(1000), COMMENT NVARCHAR2(8000) ) WITHOUT ROWID;");
+    l_run.push("CREATE INDEX if not exists [idx_kind_uuid] ON [KIND] ([UUID] DESC);");
 
-  l_run.push("CREATE TABLE if not exists CREATEUSER(UUID CHAR(32) NOT NULL PRIMARY KEY, LEVEL INTEGER, " +
-    " GRANT INTEGER, UPUSER NVARCHAR2(32)) WITHOUT ROWID;");
+    var ldb = new sqlite3.Database(gdbFile);
+    ldb.serialize( function() {
+      for (var i in l_run) {
+        ldb.run(l_run[i], function (err, row) {
+          if (err) logErr(" 初始化创建数据库错误: ",err.message,l_run[i]);
+        });
+      }
+    });
+    ldb.close();
+  }
+  else console.log(gdbFile, '已经存在。没有操作。');
+};
 
-  /*
-  我的任务： plan和doing的，owner、ought有我的。列表。已完成不再列出。 点击task，列出下面的所有worklog(level权限。)
-  新建任务。（可以是根），选人的时候，只能选择myman。
-  任务全览。回头搞。
-  日志查询。查询状态、内容。按照owner。和level查询。leve能够查询同等级的。
-  user管理。，myman选项，自动列出自己的所有员工。user查询，查看他的task。和worklog（根据权限。）
-  */
-  var l_init = true;
-}
 var gdb = new sqlite3.Database(gdbFile);
-if (l_init) {
-  gdb.serialize(function() {
-    for (var i in l_run) {
-      gdb.run(l_run[i], function (err, row) {
-        if (err) logErr(" 初始化创建数据库错误: ",err.message,l_run[i]);
-      });
-    }
-  });
-}
 
 var genSave = function (aObj, aTable) {    //  列名必须大写。第一字母小写的不生成。 返回sql和 执行参数。
   if (!aObj._exState) {
