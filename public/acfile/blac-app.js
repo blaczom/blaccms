@@ -13,6 +13,13 @@ app.config(function($stateProvider, $urlRouterProvider) {
       url: "/actop",
       templateUrl: "partials/actop.html"
     })
+    .state('actop.cover', {
+      url: "/cover",
+      templateUrl: "partials/actopcover.html",
+      controller: function($scope) {
+          $scope.items = ["acAc", "Listac", "acOf", "acItems"];
+      }
+    })
     .state('actop.list', {
       url: "/list",
       templateUrl: "partials/actoplist.html",
@@ -55,7 +62,7 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
         blacStore.localWord(lp.lUser.word);
         blacStore.localRem(lp.lUser.rem);
         $rootScope.$broadcast(blacAccess.gEvent.login);
-        $location.path('/');
+        $location.path('/actop/cover');
       }
       else{
         lp.rtnInfo = data.rtnInfo;
