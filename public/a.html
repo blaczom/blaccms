@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+    <title> </title>
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+	<style>
+	#my{position:absolute;left:43%;top:100px;background:url(images/loading-bg.png) no-repeat 50% 50%;width:159px;color:#999;font-size:18px;height:40px;font-weight:300;padding-top:14px;}
+	</style>
+	
+</head>
+<body>
+    <form id="form1" runat="server">
+		<input id="Button1" type="button" value="button"  />
+		<input id="Button2" type="button" value="show"/>
+		<div id="my" style=" display:none">
+			<img src="img/loading.gif" />
+		</div>
+		<div id="x"></div>
+    </form>
+
+
+    view-source:http://www.17sucai.com/preview/1/2013-05-04/jquery-delete/index.html
+</body>
+</html>
+
+<script>
+  $.ajaxPrefilter(function (options){options.global = true;});
+
+  $("#Button1").click(function(){
+					 $.ajax({
+			             type : "get",
+			             async: true,
+			             url : "https://public-api.wordpress.com/rest/v1/freshly-pressed",
+			             dataType : "jsonp",
+			             jsonp: "callback",
+			             jsonpCallback:"jsonpCallback",
+			             success : function(json){
+			                 $("#x").text(JSON.stringify(json));
+			             },
+			             error:function(){
+			                 alert('fail');
+			             }
+			         })
+         });
+		 
+         $(document).ajaxStart(function(){ $("#my").show(); });
+		     $(document).ajaxStop(function(){ $("#my").hide(); });
+         $("#Button2").click( function(){ $('#my').toggle($(this).show, $(this).hide) } );		
+</script>
+
+ 
