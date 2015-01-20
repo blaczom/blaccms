@@ -1,7 +1,7 @@
 /**
  * Created by Administrator on 2015/1/15.
  */
-var app = angular.module('blacapp', ['ui.router', 'blac-util']);
+var app = angular.module('blacapp', ['ui.router', 'blac-util', 'ui.tree']);
 
 app.config(function($stateProvider, $urlRouterProvider) {
   //
@@ -21,11 +21,9 @@ app.config(function($stateProvider, $urlRouterProvider) {
       }
     })
     .state('actop.list', {
-      url: "/list",
+      url: "/list/:nodeId",
       templateUrl: "partials/actoplist.html",
-      controller: function($scope) {
-        $scope.items = ["acAc", "Listac", "acOf", "acItems"];
-      }
+      controller: ctrlArticleList
     })
     .state('acsec', {
       url: "/acsec",
@@ -33,10 +31,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
     .state('acsec.list', {
       url: "/aclist",
-      templateUrl: "partials/acseclist.html",
-      controller: function($scope) {
-        $scope.things = ["Ac", "acSet", "acOf", "acThings"];
-      }
+      templateUrl: "partials/acseclist.html"
     }).state('login', {
       url: "/login",
       templateUrl: "partials/login.html"
@@ -70,6 +65,39 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
     }, function (error) {  lp.rtnInfo = JSON.stringify(status); });
   };
 });
+
+app.controller("ctrlManage",function($scope) {
+  var lp = $scope;
+  lp.nodeAdd = function (aArg) {
+    console.log('add',aArg);
+  };
+  lp.nodeDelete = function (aArg) {
+    console.log('delete',aArg);
+  };
+
+  lp.treeData = [ {"id": 0, "title": "根", "items": [] } ];
+
+  lp.newSubItem = function(scope) {
+    var nodeData = scope.$modelValue;
+    if (scope.collapsed) {
+      console.log('colapsed.');
+      scope.expand();
+    }
+    nodeData.items.push({
+      id: 1, // nodeData.id * 10 + nodeData.items.length,
+      title: '1', // nodeData.title + '.' + (nodeData.items.length + 1),
+      items: []
+    });
+  };
+
+});
+
+function ctrlArticleList ($scope, $stateParams) {
+  var lp = $scope;
+  console.log('link',$stateParams);
+
+};
+
 app.controller("ctrlRegUser", function($scope,exStore,exAccess){
   var lp = $scope;
   lp.user = exAccess.USER.newUser();

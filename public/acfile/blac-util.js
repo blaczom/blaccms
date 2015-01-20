@@ -187,3 +187,7 @@ angular.module('blac-util', ['angular-md5'])
       */
   });   // 业务功能封装
 ;
+
+
+$(document).ajaxStart(function(){ $("#loading").show(); });
+$(document).ajaxStop(function(){ $("#loading").hide(); });

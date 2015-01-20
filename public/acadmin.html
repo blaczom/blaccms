@@ -5,9 +5,15 @@
   <title>黑小巫的通用门户网站</title>
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="acfile/main.css" rel="stylesheet">
-  <link href="acfile/jqtree.css" rel="stylesheet" >
+  <link href="acfile/angular-ui-tree.css" rel="stylesheet">
+  <style>
+    #loading{position:absolute;left:43%;top:100px;}
+  </style>
 </head>
 <body>
+<div id="loading" style="display:none">
+  <img src="img/loading.gif" />
+</div>
 
 <nav class="navbar" style="margin-bottom:0px;" role="navigation">
   <div class="container-fluid" style="background: #00aff0" ng-controller="ctrlAdmin">
@@ -57,4 +63,4 @@
 
 <script src="acfile/blac-util.js"></script>
 <script src="acfile/blac-app.js"></script>
-<script src="acfile/tree.jquery.js"></script>
+<script src="acfile/angular-ui-tree.js"></script>
