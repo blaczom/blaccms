@@ -48,7 +48,7 @@ app.controller("ctrlAdmin",function($scope,blacStore,blacAccess) {
 app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAccess) {
   var lp = $scope;
   lp.rtnInfo = "";
-  lp.lUser = {rem:blacStore.localRem(), name:blacStore.localUser(), word:blacStore.localWord()  }
+  lp.lUser = {rem:blacStore.localRem(), name:blacStore.localUser(), word:blacStore.localWord()  };
 
   lp.userLogin = function () {
     blacAccess.userLoginQ(lp.lUser).then( function(data) {
@@ -66,36 +66,53 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
   };
 });
 
-app.controller("ctrlManage",function($scope) {
+app.controller("ctrlManage",function($scope,blacUtil,$window,$location) {
   var lp = $scope;
-  lp.nodeAdd = function (aArg) {
-    console.log('add',aArg);
-  };
-  lp.nodeDelete = function (aArg) {
-    console.log('delete',aArg);
-  };
+  lp.treeData = [ {"id":0,"title":"根","items":[],"deleteId":[] } ];
+  lp.treeDelete = [];
 
-  lp.treeData = [ {"id": 0, "title": "根", "items": [] } ];
+  lp.tState = {new:"new", dirty:'dirty', clean:"clean"};
 
-  lp.newSubItem = function(scope) {
-    var nodeData = scope.$modelValue;
-    if (scope.collapsed) {
+  lp.wrapRemove = function (aNode) {
+    var nodeData = aNode.$modelValue;
+    if (nodeData.id == 0) return;
+    if ( $window.confirm( "确认删除他和所有的子记录么？" ))
+      if (nodeData.state == lp.tState.new )
+        aNode.remove();
+      else {
+          lp.treeData[0].deleteId.push(nodeData.id);
+          aNode.remove();
+      }
+
+    };
+
+  lp.newSubItem = function(aNode) {
+    var nodeData = aNode.$modelValue;
+    if (aNode.collapsed) {
       console.log('colapsed.');
-      scope.expand();
+        aNode.expand();
     }
     nodeData.items.push({
-      id: 1, // nodeData.id * 10 + nodeData.items.length,
-      title: '1', // nodeData.title + '.' + (nodeData.items.length + 1),
+      id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
+      parentId: nodeData.id,
+      title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
+      state: lp.tState.new,
+      ex_parm: {},
       items: []
     });
   };
 
+  lp.nodeClick = function(aNode){
+      var nodeData = aNode.$modelValue;
+      if (nodeData.id == 0) return;
+      console.log(nodeData.id);
+      $location.path('/actop/list/' + nodeData.id);
+  };
 });
 
 function ctrlArticleList ($scope, $stateParams) {
   var lp = $scope;
   console.log('link',$stateParams);
-
 };
 
 app.controller("ctrlRegUser", function($scope,exStore,exAccess){

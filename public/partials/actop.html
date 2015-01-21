@@ -1,9 +1,8 @@
 <div class="container-fluid" >
-  <div class="row" style="min-height: 450px;">
-    <div class="col-md-4 sidebar" style="padding-left: 0px;" ng-controller="ctrlManage">
+  <div class="row" style="min-height: 450px;" ng-controller="ctrlManage">
+    <div class="col-md-4 sidebar" style="padding-left: 0px;" >
 
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="font-size:1.2em; line-height: 1.6em; ">
-
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingTwo">
             <h4 class="panel-title">
@@ -18,6 +17,7 @@
             </div>
           </div>
         </div>
+
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingThree">
             <h4 class="panel-title">
@@ -38,6 +38,7 @@
             </div>
           </div>
         </div>
+
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingOne">
             <h4 class="panel-title">
@@ -54,8 +55,8 @@
               <script type="text/ng-template" id="items_renderer.html">
                 <div ui-tree-handle>
                   <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
-                  {{item.title}}
-                  <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="remove(this)"><span class="glyphicon glyphicon-remove"></span></a>
+                  <a ng-click="nodeClick(this)" > {{item.title}} </a>
+                  <a class="pull-right btn btn-danger btn-xs" data-nodrag ng-click="wrapRemove(this)"><span class="glyphicon glyphicon-remove"></span></a>
                   <a class="pull-right btn btn-primary btn-xs" data-nodrag ng-click="newSubItem(this)" style="margin-right: 8px;"><span class="glyphicon glyphicon-plus"></span></a>
                 </div>
                 <ol ui-tree-nodes="options" ng-model="item.items" ng-class="{hidden: collapsed}">
@@ -64,7 +65,7 @@
                 </ol>
               </script>
 
-              <div ui-tree="options" data-drag-enabled="false" data-max-depth="2" >
+              <div ui-tree="options" data-drag-enabled="false" max-depth="3" >
                 <ol ui-tree-nodes ng-model="treeData" data-max-depth="5" >
                   <li ng-repeat="item in treeData" ui-tree-node ng-include="'items_renderer.html'"></li>
                 </ol>
