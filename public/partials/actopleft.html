@@ -65,14 +65,14 @@
                 </ol>
               </script>
 
-              <div ui-tree="options" data-drag-enabled="false" max-depth="3" >
+              <div ui-tree data-drag-enabled="false" id="tree-root">
                 <ol ui-tree-nodes ng-model="treeData" data-max-depth="5" >
                   <li ng-repeat="item in treeData" ui-tree-node ng-include="'items_renderer.html'"></li>
                 </ol>
               </div>
-              <button class="btn btn-success btn-xs" > save </button>
+              <button ng-click="saveTree()" class="btn btn-success btn-xs" > save </button>
               <button class="btn btn-success btn-xs" > reset </button>
-
+              <button ng-click="treeExpandAll()" class="btn btn-success btn-xs" > 全部展开 </button>
             </div>
           </div>
         </div>

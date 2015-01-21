@@ -31,6 +31,7 @@ router.post('/', function(req, res) {
   logInfo("get client rest: " , req.body);
   var lFunc = req.body['func']; // 功能名称： 'userlogin' 等等
   var lExparm = req.body['ex_parm'];  // 参数对象: {}
+
   /* 暂时屏蔽掉没登录的限制。
   if ("userlogin,userReg,exTools,,,".indexOf(lFunc+",") < 0) {   // 需要登录的对象。
     if (!checkLogin(req,res)) {
@@ -77,8 +78,18 @@ router.post('/', function(req, res) {
       var lRtn = rtnMsg('成功');
       lRtn.exObj.columnTree = JSON.stringify(lTreeData);
       res.json( lRtn );
+      break;
     }
+    case "setAdminColumn": {
+      // { func: 'setAdminColumn', ex_parm:{ columnTree: [...] }}
 
+      var lfs = require('fs');
+      var lrtn = lfs.writeFileSync("./routes/treeData.json", lExparm.columnTree);
+
+      console.log('writefiel', lrtn);
+      res.json( rtnMsg('成功') );
+      break;
+    }
     default :
       res.json(rtnErr('不存在该请求：' + JSON.stringify(req.body)));
       break;

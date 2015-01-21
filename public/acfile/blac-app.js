@@ -67,57 +67,67 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
 
 app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
   var lp = $scope;
-  // lp.treeData = [ {"id":0,"title":"根","items":[],"deleteId":[] } ];
+
   // 后台管理端：栏目设置。
-  lp.treeData = [];
   {
-    $http.post('/rest', { func: 'getAdminColumn', ex_parm:{} } ).
-      success(function(data, status, headers, config) {
-        if (data.rtnCode == 1) lp.treeData = JSON.parse( data.exObj.columnTree );
+    lp.treeData = [];
+    lp.treeState = {new: "new", dirty: 'dirty', clean: "clean"};
+    $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
+      success(function (data, status, headers, config) {
+        if (data.rtnCode == 1) lp.treeData = JSON.parse(data.exObj.columnTree);
         else console.log(data);
       }).
-      error( function(data, status, headers, config) {
+      error(function (data, status, headers, config) {
         console.log(status, data);
       });
-    lp.treeState = {new:"new", dirty:'dirty', clean:"clean"};
 
     lp.wrapRemove = function (aNode) {
-        var nodeData = aNode.$modelValue;
-        if (nodeData.id == 0) return;
-        if ( $window.confirm( "确认删除他和所有的子记录么？" ))
-            if (nodeData.state == lp.treeState.new )
-                aNode.remove();
-            else {
-                lp.treeData[0].deleteId.push(nodeData.id);
-                aNode.remove();
-            }
-
-    };
-
-    lp.newSubItem = function(aNode) {
-        var nodeData = aNode.$modelValue;
-        if (aNode.collapsed) {
-            console.log('colapsed.');
-            aNode.expand();
+      var nodeData = aNode.$modelValue;
+      if (nodeData.id == 0) return;
+      if ($window.confirm("确认删除他和所有的子记录么？"))
+        if (nodeData.state == lp.treeState.new)
+          aNode.remove();
+        else {
+          lp.treeData[0].deleteId.push(nodeData.id);
+          aNode.remove();
         }
-        nodeData.items.push({
-            id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
-            parentId: nodeData.id,
-            title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
-            state: lp.treeState.new,
-            ex_parm: {},
-            items: []
+
+    };
+    lp.newSubItem = function (aNode) {
+      var nodeData = aNode.$modelValue;
+      if (aNode.collapsed) {
+        console.log('colapsed.');
+        aNode.expand();
+      }
+      nodeData.items.push({
+        id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
+        parentId: nodeData.id,
+        title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
+        state: lp.treeState.new,
+        ex_parm: {},
+        items: []
+      });
+    };
+    lp.nodeClick = function (aNode) {
+      if (aNode.$modelValue.id == 0) return;
+      lp.clickNode = aNode.$modelValue;
+      $location.path('/actop/list/' + lp.clickNode.id);
+    };
+    lp.nodeTitleChanged = function (aCurNode) {
+      if (aCurNode.state != lp.treeState.new) aCurNode.state = lp.treeState.dirty;
+    }
+    lp.treeExpandAll = function(){
+      angular.element(document.getElementById("tree-root")).scope().expandAll();
+    };
+    lp.saveTree = function(){
+      $http.post('/rest', { func: 'setAdminColumn', ex_parm: { columnTree: JSON.stringify(lp.treeData) }}).
+        success(function (data, status, headers, config) {
+          if (data.rtnCode == 1) console.log('save ok. ');
+          else console.log(data);
+        }).
+        error(function (data, status, headers, config) {
+          console.log(status, data);
         });
-    };
-
-    lp.nodeClick = function(aNode){
-        if (aNode.$modelValue.id == 0) return;
-        lp.clickNode = aNode.$modelValue;
-        $location.path('/actop/list/' + lp.clickNode.id);
-    };
-
-    lp.nodeTitleChanged = function(aCurNode){
-      if (aCurNode.state!=lp.treeState.new) aCurNode.state = lp.treeState.dirty;
     }
   }
 
