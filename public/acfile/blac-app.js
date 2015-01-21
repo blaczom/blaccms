@@ -11,7 +11,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
     .state('actop', {
       url: "/actop",
-      templateUrl: "partials/actop.html"
+      templateUrl: "partials/actopleft.html"
     })
     .state('actop.cover', {
       url: "/cover",
@@ -22,8 +22,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
     .state('actop.list', {
       url: "/list/:nodeId",
-      templateUrl: "partials/actoplist.html",
-      controller: ctrlArticleList
+      templateUrl: "partials/actoplist.html"
     })
     .state('acsec', {
       url: "/acsec",
@@ -66,69 +65,60 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
   };
 });
 
-app.controller("ctrlManage",function($scope,blacUtil,$window,$location) {
+app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
   var lp = $scope;
-  lp.treeData = [ {"id":0,"title":"根","items":[],"deleteId":[] } ];
-  lp.treeDelete = [];
+  // lp.treeData = [ {"id":0,"title":"根","items":[],"deleteId":[] } ];
+  // 后台管理端：栏目设置。
+  lp.treeData = [];
+  {
+    $http.post('/rest', { func: 'getAdminColumn', ex_parm:{} } ).
+      success(function(data, status, headers, config) {
+        if (data.rtnCode == 1) lp.treeData = JSON.parse( data.exObj.columnTree );
+        else console.log(data);
+      }).
+      error( function(data, status, headers, config) {
+        console.log(status, data);
+      });
+    lp.treeState = {new:"new", dirty:'dirty', clean:"clean"};
 
-  lp.tState = {new:"new", dirty:'dirty', clean:"clean"};
-
-  lp.wrapRemove = function (aNode) {
-    var nodeData = aNode.$modelValue;
-    if (nodeData.id == 0) return;
-    if ( $window.confirm( "确认删除他和所有的子记录么？" ))
-      if (nodeData.state == lp.tState.new )
-        aNode.remove();
-      else {
-          lp.treeData[0].deleteId.push(nodeData.id);
-          aNode.remove();
-      }
+    lp.wrapRemove = function (aNode) {
+        var nodeData = aNode.$modelValue;
+        if (nodeData.id == 0) return;
+        if ( $window.confirm( "确认删除他和所有的子记录么？" ))
+            if (nodeData.state == lp.treeState.new )
+                aNode.remove();
+            else {
+                lp.treeData[0].deleteId.push(nodeData.id);
+                aNode.remove();
+            }
 
     };
 
-  lp.newSubItem = function(aNode) {
-    var nodeData = aNode.$modelValue;
-    if (aNode.collapsed) {
-      console.log('colapsed.');
-        aNode.expand();
+    lp.newSubItem = function(aNode) {
+        var nodeData = aNode.$modelValue;
+        if (aNode.collapsed) {
+            console.log('colapsed.');
+            aNode.expand();
+        }
+        nodeData.items.push({
+            id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
+            parentId: nodeData.id,
+            title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
+            state: lp.treeState.new,
+            ex_parm: {},
+            items: []
+        });
+    };
+
+    lp.nodeClick = function(aNode){
+        if (aNode.$modelValue.id == 0) return;
+        lp.clickNode = aNode.$modelValue;
+        $location.path('/actop/list/' + lp.clickNode.id);
+    };
+
+    lp.nodeTitleChanged = function(aCurNode){
+      if (aCurNode.state!=lp.treeState.new) aCurNode.state = lp.treeState.dirty;
     }
-    nodeData.items.push({
-      id: blacUtil.createUUID(), // nodeData.id * 10 + nodeData.items.length,
-      parentId: nodeData.id,
-      title: '新节点', // nodeData.title + '.' + (nodeData.items.length + 1),
-      state: lp.tState.new,
-      ex_parm: {},
-      items: []
-    });
-  };
+  }
 
-  lp.nodeClick = function(aNode){
-      var nodeData = aNode.$modelValue;
-      if (nodeData.id == 0) return;
-      console.log(nodeData.id);
-      $location.path('/actop/list/' + nodeData.id);
-  };
-});
-
-function ctrlArticleList ($scope, $stateParams) {
-  var lp = $scope;
-  console.log('link',$stateParams);
-};
-
-app.controller("ctrlRegUser", function($scope,exStore,exAccess){
-  var lp = $scope;
-  lp.user = exAccess.USER.newUser();
-  lp.user.authCode = "";
-  lp.rtnInfo = "";
-  lp.namePattern = new RegExp('(\\w|@|\\.)+');
-  lp.userReg = function(){
-    exAccess.userRegPromise(lp.user).
-      then(function (data) {
-        exStore.log("---got the rtn date", data);
-        lp.rtnInfo = data.rtnInfo;
-        if (!exStore.getUser()) exStore.setUser(lp.user.NICKNAME);
-      } , function (status) {
-        lp.rtnInfo = JSON.stringify(status);
-      });
-  };
 });

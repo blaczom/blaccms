@@ -1,7 +1,7 @@
 {
-  "name": "blacz.www",
-  "version": "0.0.6",
-  "description": "www server",
+  "name": "blaccms",
+  "version": "0.0.1",
+  "description": "simple cms",
   "main": "index.js",
   "dependencies": {
     "express": "4.x",
@@ -15,10 +15,6 @@
     "type": "git",
     "url": "https://github.com/blaczom/blacz.www.git"
   },
-  "bin": {
-    "_blacz.www": "./bin/blacz.www.ln",
-    "blacz.www": "./bin/blacz.www.cmd"
-  },
   "keywords": [
     "www",
     "http"
@@ -28,7 +24,7 @@
   "bugs": {
     "url": "https://github.com/blaczom/blacz.www/issues"
   },
-  "homepage": "https://github.com/blaczom/blacz.www",
+  "homepage": "https://github.com/blaczom/blaccms",
   "devDependencies": {
     "gulp": "^3.8.10"
   }

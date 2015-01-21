@@ -31,6 +31,7 @@ router.post('/', function(req, res) {
   logInfo("get client rest: " , req.body);
   var lFunc = req.body['func']; // 功能名称： 'userlogin' 等等
   var lExparm = req.body['ex_parm'];  // 参数对象: {}
+  /* 暂时屏蔽掉没登录的限制。
   if ("userlogin,userReg,exTools,,,".indexOf(lFunc+",") < 0) {   // 需要登录的对象。
     if (!checkLogin(req,res)) {
       var l_rtn = rtnErr('未登录，请先登录。');
@@ -40,6 +41,8 @@ router.post('/', function(req, res) {
       return; // STOP HERE.
     }
   }
+  */
+
   // 正常功能处理：
   switch (lFunc){
     case "userlogin": { // lExparm.user:{name:xx,word:xx}
@@ -68,6 +71,14 @@ router.post('/', function(req, res) {
       }); */
       break;
     }
+    case "getAdminColumn": {
+      //{"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{columnTree:[...]}}
+      lTreeData = require("./treeData.json");
+      var lRtn = rtnMsg('成功');
+      lRtn.exObj.columnTree = JSON.stringify(lTreeData);
+      res.json( lRtn );
+    }
+
     default :
       res.json(rtnErr('不存在该请求：' + JSON.stringify(req.body)));
       break;
