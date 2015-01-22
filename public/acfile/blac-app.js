@@ -24,6 +24,10 @@ app.config(function($stateProvider, $urlRouterProvider) {
       url: "/list/:nodeId",
       templateUrl: "partials/actoplist.html"
     })
+    .state('actop.listsec', {
+      url: "/listsec/:nodeId",
+      templateUrl: "partials/actoplistsec.html"
+    })
     .state('acsec', {
       url: "/acsec",
       templateUrl: "partials/acsec.html"
@@ -148,21 +152,22 @@ app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
     }
   }
 
-  // user input the content.
-  $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
-    success(function (data, status, headers, config) {
-      if (data.rtnCode == 1) lp.treeContentData = JSON.parse(data.exObj.columnTree);
-      else console.log(data);
+  // 后台管理端：  用户录入内容。
+  {
+    $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
+      success(function (data, status, headers, config) {
+        if (data.rtnCode == 1) lp.treeContentData = JSON.parse(data.exObj.columnTree)[0].items;
+        else console.log(data);
 
-    }).
-    error(function (data, status, headers, config) {
+      }).
+      error(function (data, status, headers, config) {
       console.log(status, data);
     });
-  {
+
     lp.node4ContentClick = function (aNode) {
       if (aNode.$modelValue.id == 0) return;
       lp.clickNode = aNode.$modelValue;
-      $location.path('/actop/list/' + lp.clickNode.id);
+      $location.path('/actop/listsec/' + lp.clickNode.id);
     };
   }
 
