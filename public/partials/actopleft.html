@@ -13,7 +13,24 @@
           </div>
           <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
             <div class="panel-body">
-              Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry
+
+              <script type="text/ng-template" id="items4content_renderer.html">
+                <div ui-tree-handle>
+                  <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
+                  <a ng-click="node4ContentClick(this)" > {{item4content.title}} </a>
+                </div>
+                <ol ui-tree-nodes="options" ng-model="item4content.items" ng-class="{hidden: collapsed}">
+                  <li ng-repeat="item4content in item4content.items" ui-tree-node ng-include="'items4content_renderer.html'">
+                  </li>
+                </ol>
+              </script>
+
+              <div ui-tree data-drag-enabled="false" id="tree-content-root">
+                <ol ui-tree-nodes ng-model="treeContentData" data-max-depth="5" >
+                  <li ng-repeat="item4content in treeContentData" ui-tree-node ng-include="'items4content_renderer.html'"></li>
+                </ol>
+              </div>
+
             </div>
           </div>
         </div>
@@ -28,12 +45,9 @@
           </div>
           <div id="collapseThree" class="panel-collapse collapse " role="tabpanel" aria-labelledby="headingThree">
             <div class="panel-body">
-
               <ul class="nav nav-sidebar" >
-              <li class="active"><a href="#">用户管理</a></li>
-              <li><a href="#">Reports</a></li>
-              <li><a href="#">Analytics</a></li>
-              <li><a href="#">Export</a></li>
+              <li class="active"><a href="#">更改密码</a></li>
+              <li><a href="#">用户管理</a></li>
             </ul>
             </div>
           </div>
@@ -71,7 +85,7 @@
                 </ol>
               </div>
               <button ng-click="saveTree()" class="btn btn-success btn-xs" > save </button>
-              <button class="btn btn-success btn-xs" > reset </button>
+              <button ng-click="wrapConfirm('确认放弃修改么？', initColumDefTree)" class="btn btn-success btn-xs" > reset </button>
               <button ng-click="treeExpandAll()" class="btn btn-success btn-xs" > 全部展开 </button>
             </div>
           </div>

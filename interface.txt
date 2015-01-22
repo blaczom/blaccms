@@ -1,6 +1,6 @@
 全部基于post的方式。
 
-表column: id, parentid, kind, title.
+表column: id, parentid, kind, title, link.
 表article: id, parentid, kind, title, content, imglink, videolink
 
 
@@ -40,6 +40,13 @@ ajax更改栏目内容：
 django返回：
 {"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{columnTree:[...]}}
 
+columnTree的格式(对应表column: id, parentid, kind, title, link.)：
+"id": "C67743685CF00001FFEB15602B167D",
+"parentId": 0,
+"title": "新节点1",
+"state": "clean",
+"ex_parm": { kind:"1234", link:"12345"},
+"items": []
 
 查询和更新的格式：所有数据都在一个id为0的根节点下面。
 [
@@ -52,7 +59,7 @@ django返回：
         "parentId": 0,
         "title": "新节点1",
         "state": "clean",
-        "ex_parm": {},
+        "ex_parm": { kind:"", link:""},
         "items": []
       },
       {

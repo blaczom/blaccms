@@ -43,7 +43,6 @@ app.controller("ctrlAdmin",function($scope,blacStore,blacAccess) {
     lp.loginedUser = blacStore.localUser();
   });
 });
-
 app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAccess) {
   var lp = $scope;
   lp.rtnInfo = "";
@@ -64,7 +63,6 @@ app.controller("ctrlLogin",function($rootScope,$scope,$location,blacStore,blacAc
     }, function (error) {  lp.rtnInfo = JSON.stringify(status); });
   };
 });
-
 app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
   var lp = $scope;
 
@@ -72,15 +70,34 @@ app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
   {
     lp.treeData = [];
     lp.treeState = {new: "new", dirty: 'dirty', clean: "clean"};
-    $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
-      success(function (data, status, headers, config) {
-        if (data.rtnCode == 1) lp.treeData = JSON.parse(data.exObj.columnTree);
-        else console.log(data);
-      }).
-      error(function (data, status, headers, config) {
-        console.log(status, data);
-      });
 
+    lp.wrapConfirm = function(aMsg, aObj){
+    // wrapConfirm("确认放弃修改么？", initColumDefTree)
+      if ( $window.confirm(aMsg) )
+        aObj.apply(null, Array.prototype.slice.call(arguments,2) );
+    };
+
+    lp.initColumDefTree = function() {
+      $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
+        success(function (data, status, headers, config) {
+          if (data.rtnCode == 1) lp.treeData = JSON.parse(data.exObj.columnTree);
+            else console.log(data);
+
+        }).
+        error(function (data, status, headers, config) {
+            console.log(status, data);
+        });
+      };
+    lp.wrapInitColumDefTree = function() {
+      $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
+        success(function (data, status, headers, config) {
+          if (data.rtnCode == 1) lp.treeData = JSON.parse(data.exObj.columnTree);
+          else console.log(data);
+        }).
+        error(function (data, status, headers, config) {
+          console.log(status, data);
+        });
+    };
     lp.wrapRemove = function (aNode) {
       var nodeData = aNode.$modelValue;
       if (nodeData.id == 0) return;
@@ -115,7 +132,7 @@ app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
     };
     lp.nodeTitleChanged = function (aCurNode) {
       if (aCurNode.state != lp.treeState.new) aCurNode.state = lp.treeState.dirty;
-    }
+    };
     lp.treeExpandAll = function(){
       angular.element(document.getElementById("tree-root")).scope().expandAll();
     };
@@ -129,6 +146,24 @@ app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
           console.log(status, data);
         });
     }
+  }
+
+  // user input the content.
+  $http.post('/rest', { func: 'getAdminColumn', ex_parm: {} }).
+    success(function (data, status, headers, config) {
+      if (data.rtnCode == 1) lp.treeContentData = JSON.parse(data.exObj.columnTree);
+      else console.log(data);
+
+    }).
+    error(function (data, status, headers, config) {
+      console.log(status, data);
+    });
+  {
+    lp.node4ContentClick = function (aNode) {
+      if (aNode.$modelValue.id == 0) return;
+      lp.clickNode = aNode.$modelValue;
+      $location.path('/actop/list/' + lp.clickNode.id);
+    };
   }
 
 });
