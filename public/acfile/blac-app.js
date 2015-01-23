@@ -22,7 +22,7 @@ app.config(function($stateProvider, $urlRouterProvider) {
     })
     .state('actop.list', {
       url: "/list/:nodeId",
-      templateUrl: "partials/actoplist.html"
+      templateUrl: "partials/actoplistcol.html"
     })
     .state('actop.listsec', {
       url: "/listsec/:nodeId",
@@ -164,11 +164,59 @@ app.controller("ctrlManage", function($scope,blacUtil,$window,$location,$http) {
       console.log(status, data);
     });
 
+    // 点击用户栏目。
+    lp.psContentInfo = { pageCurrent: 1, pageRows: 10, pageTotal: 0  }; // init;
+    lp.clickContentNode = { id : 0 };  // init;
+    lp.contentList = [];
+
     lp.node4ContentClick = function (aNode) {
       if (aNode.$modelValue.id == 0) return;
-      lp.clickNode = aNode.$modelValue;
-      $location.path('/actop/listsec/' + lp.clickNode.id);
+      if (lp.clickContentNode.id != aNode.$modelValue.id) {
+        lp.clickContentNode = aNode.$modelValue;
+        lp.psContentInfo = { pageCurrent: 1, pageRows: 10, pageTotal: 0  };
+        $location.path('/actop/listsec/' + lp.clickContentNode.id);
+        lp.psGetContent(0);
+      }
     };
+
+    // 用户录入内容翻页。page scroll
+    lp.psGetContent = function (aPageNumber) {
+      var lNoNeed = false;
+      switch (aPageNumber) {
+        case -1:
+          if (lp.psContentInfo.pageCurrent > 1) lp.psContentInfo.pageCurrent = 1; else lNoNeed = true;
+          break;
+        case -2:
+          if (lp.psContentInfo.pageCurrent > 1) lp.psContentInfo.pageCurrent -= 1; else lNoNeed = true;
+          break;
+        case -3:
+          if (lp.psContentInfo.pageCurrent < lp.psContentInfo.pageTotal) lp.psContentInfo.pageCurrent += 1; else lNoNeed = true;
+          break;
+        case -4:
+          if (lp.psContentInfo.pageCurrent < lp.psContentInfo.pageTotal) lp.psContentInfo.pageCurrent = lp.psContentInfo.pageTotal; else lNoNeed = true;
+          break;
+        case 0:
+          break
+      }
+
+      if (!lNoNeed) {
+        var lLocation = { pageCurrent: lp.psContentInfo.pageCurrent, pageRows:lp.psContentInfo.pageRows, pageTotal:lp.psContentInfo.pageTotal };
+        $http.post('/rest', { func: 'getContentList', ex_parm: { location: lLocation} } ).
+          success(function (data, status, headers, config) {
+            if (data.rtnCode == 1) {
+              //"exObj":{ rowCount:xxx,  contentList: [ {id:xx, title:xx, owner:xx, rectime:xxxx},...] } }
+              if (lp.psContentInfo.pageTotal) lp.psContentInfo.pageTotal = Math.floor(data.exObj.rowCount / lp.psContentInfo.pageRows ) + 1;
+              lp.contentList = data.exObj.contentList;
+            }
+            else console.log(data);
+
+          }).
+          error(function (data, status, headers, config) {
+            console.log(status, data);
+          });
+      }
+    }
+
   }
 
 });

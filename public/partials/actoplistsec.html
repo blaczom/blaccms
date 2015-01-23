@@ -1,5 +1,7 @@
 <br>
   <h3 class="sub-header">信息发布</h3>
+
+
   <div class="table-responsive">
     <table class="table table-striped">
       <thead>
@@ -11,6 +13,10 @@
       </tr>
       </thead>
       <tbody>
+
+      <div class="contentBodyContent" ng-repeat='taskItem in para.taskSet' >
+      </div>
+
       <tr>
         <td>1,001</td>
         <td><a href="" > Lorem </a></td>
@@ -68,6 +74,17 @@
       </tbody>
     </table>
   </div>
+
+
+<nav>
+  <ul class="pagination">
+    <li><a href="#" ng-click="psGetContent(-1)"><i class="glyphicon glyphicon-fast-backward"></i> </a></li>
+    <li><a href="#" ng-click="psGetContent(-2)"><i class="glyphicon glyphicon-chevron-left"></i> </a></li>
+    <li><a href="#" class="focus">1</a></li>
+    <li><a href="#" ng-click="psGetContent(-3)"><i class="glyphicon glyphicon-chevron-right"></i> </a></li>
+    <li><a href="#" ng-click="psGetContent(-4)"><i class="glyphicon glyphicon-fast-forward"></i> </a></li>
+  </ul>
+</nav>
 
 <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" data-backdrop="static">
   Launch demo modal

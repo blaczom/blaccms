@@ -1,7 +1,7 @@
 全部基于post的方式。
 
 表column: id, parentid, kind, title, link.
-表article: id, parentid, kind, title, content, imglink, videolink
+表article: id, parentid, kind, title, content, imglink, videolink, owner, rectime.
 
 
 
@@ -107,3 +107,15 @@ state说明：
   clean：不用
 
 根节点下面有个"deleteId": [xxx,xxx]。生成delete语句。并且把所有他下面的子节点全部删除（注意多级节点、孩子、孙子、重孙子）
+
+=============================================================================================================
+栏目下面的article。
+ajax查询栏目下的article列表。
+{ func: 'getContentList', ex_parm:{ location: { pageCurrent:当前页, pageRows:一页的行数, pageTotal:共有多少页 } } }
+如果pageTotal是0，就select count(*)，返回rowCount.不然就不用管，返回rowCount:-1。
+
+django返回：
+{"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{ rowCount:xxx,  contentList: [ {id:xx, title:xx, owner:xx, rectime:xxxx},...] } }
+
+
+
