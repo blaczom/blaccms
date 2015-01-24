@@ -1,6 +1,6 @@
 <div class="container-fluid" >
-  <div class="row" style="min-height: 450px;" ng-controller="ctrlManage">
-    <div class="col-md-4 sidebar" style="padding-left: 0px;" >
+  <div class="row" style="min-height: 450px;" ng-controller="ctrlAdminLeft">
+    <div class="col-md-3 sidebar" style="padding-left: 0px;" >
 
       <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true" style="font-size:1.2em; line-height: 1.6em; ">
         <div class="panel panel-default">
@@ -17,7 +17,7 @@
               <script type="text/ng-template" id="items4content_renderer.html">
                 <div ui-tree-handle>
                   <a class="btn btn-success btn-xs" data-nodrag ng-click="toggle(this)"><span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span></a>
-                  <a ng-click="node4ContentClick(this)" > {{item4content.title}} </a>
+                  <a ng-click="clickCol4ConList(this)" > {{item4content.title}} </a>
                 </div>
                 <ol ui-tree-nodes="options" ng-model="item4content.items" ng-class="{hidden: collapsed}">
                   <li ng-repeat="item4content in item4content.items" ui-tree-node ng-include="'items4content_renderer.html'">
@@ -96,7 +96,7 @@
 
     </div>
 
-    <div class="col-md-8 main">
+    <div class="col-md-9 main">
 
       <div ui-view></div>
 

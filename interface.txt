@@ -1,7 +1,7 @@
 全部基于post的方式。
 
 表column: id, parentid, kind, title, link.
-表article: id, parentid, kind, title, content, imglink, videolink, owner, rectime.
+表article: id, parentid, kind, title, content, imglink, videolink, recname, rectime.
 
 
 
@@ -115,7 +115,7 @@ ajax查询栏目下的article列表。
 如果pageTotal是0，就select count(*)，返回rowCount.不然就不用管，返回rowCount:-1。
 
 django返回：
-{"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{ rowCount:xxx,  contentList: [ {id:xx, title:xx, owner:xx, rectime:xxxx},...] } }
+{"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{ rowCount:xxx,  contentList: [ {id:xx, title:xx, recname:xx, rectime:xxxx},...] } }
 
 
 
