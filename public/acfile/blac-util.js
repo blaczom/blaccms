@@ -26,12 +26,6 @@
  *   blacAccess.userLoginQ(aObjUser)  : 使用 xxx().then(function(data){}, function(err){})
  *   blacAccess.
  *   blacAccess.
- *   blacAccess.
- *   blacAccess.
- *   blacAccess.
- *
- *
- *
  */
 angular.module('blac-util', ['angular-md5'])
   .factory('blacUtil', function(md5){
@@ -93,7 +87,8 @@ angular.module('blac-util', ['angular-md5'])
       strDate : function(arg1){ return strDateTime(arg1,true) },
       verifyBool : function (aParam){ return (aParam==true||aParam=="true"||aParam=="True")?true:false;  } ,
       md5String: md5.createHash,
-      shareCache: { global:{} }
+      shareCache: { global:{} },
+      wrapConfirm : function(aMsg,aObj){if(window.confirm(aMsg))aObj.apply(null, Array.prototype.slice.call(arguments,2) );}
     }
   }) // md5加密支持
   .factory('blacStore', function(){
@@ -109,27 +104,24 @@ angular.module('blac-util', ['angular-md5'])
     // typeof 返回的是字符串，有六种可能："number"、"string"、"boolean"、"object"、"function"、"undefined"
 
     return{
-      localRem: function(aArg){
-        if (aArg===undefined) return(verifyBool(l_store.getItem(_storeRememberMe)||"false")); else return(l_store.setItem(_storeRememberMe, aArg));
-      },
-      localUser : function(aArg){
-        if (aArg===undefined) return(l_store.getItem(_storeUser)||""); else return(l_store.setItem(_storeUser, aArg));
-      },
-      localWord: function(aArg) {  // 设置当前用户，名称，密码和保存密码。
-        if (aArg===undefined) return(l_store.getItem(_storeWord)||""); else return(l_store.setItem(_storeWord, aArg));
-      },
+      // 设置和读取当前用户，名称，密码和保存密码。
+      localRem: function(aArg){ if (aArg===undefined) return(verifyBool(l_store.getItem(_storeRememberMe)||"false")); else return(l_store.setItem(_storeRememberMe, aArg)); },
+      localUser : function(aArg){ if (aArg===undefined) return(l_store.getItem(_storeUser)||""); else return(l_store.setItem(_storeUser, aArg));      },
+      localWord: function(aArg){ if (aArg===undefined) return(l_store.getItem(_storeWord)||""); else return(l_store.setItem(_storeWord, aArg));    },
       getErr: function(){ return(l_store.getItem(_storeErr)); },
       setErr: function(){ if (_debug) console.log(arguments);
         if (arguments.length > 0) l_store.setItem(_storeErr, JSON.stringify(arguments)); else l_store.setItem('blacStoreLocalErr', '');
       },
-      appendErr: function(aArg){ if (_debug) console.log(arguments);
+      appendErr: function(){ if (_debug) console.log(arguments);
         if (arguments.length > 0) l_store.setItem(_storeErr, l_store.getItem(_storeErr) + JSON.stringify(arguments));
       },
       customGet:function(aKey){ return( JSON.parse( l_store.getItem(aKey)||'{}' ) ); },
-      customSet:function(aKey, aObj) { return(l_store.setItem(aKey, JSON.stringify(aObj))) ;  }
+      customSet:function(aKey, aObj) { return(l_store.setItem(aKey, JSON.stringify(aObj))) ;  },
+      setLog:function(aObj){return(l_store.setItem('blacStoreStateLog', JSON.stringify(aObj))) ;}
     };
   })   // 本地存储支持
   .factory('blacAccess', function($location,$http,$q,md5){
+    var lpUrl = '/rest';
     var httpQ = function(aUrl, aObject){
       var deferred = $q.defer();
       $http.post(aUrl, aObject)
@@ -146,7 +138,7 @@ angular.module('blac-util', ['angular-md5'])
       lObjUser.md5 = md5.createHash(lObjUser.name + lObjUser.word);
       delete(lObjUser.word);
       delete(lObjUser.rem);
-      return httpQ('/rest', { func: 'userlogin', ex_parm:{ user: lObjUser } }); // user: {name:xx,word:xx}
+      return httpQ(lpUrl, { func: 'userlogin', ex_parm:{ user: lObjUser } }); // user: {name:xx,word:xx}
     };
     var checkRtn = function (aRtn) {
       if (aRtn.rtnCode == 0)       // 当返回0的时候表示有后续的附加操作。进一步判断appendOper
@@ -161,13 +153,21 @@ angular.module('blac-util', ['angular-md5'])
     var userChange = function(aObjUser){
       aObjUser.md5 = md5.createHash(aObjUser.name+aObjUser.word) ;
       aObjUser.oldmd5 = md5.createHash(aObjUser.name+aObjUser.oldword) ;
-      return httpCom('/rest', { func: 'userChange',  ex_parm:{user:aobjUser}})
+      return httpQ(lpUrl, { func: 'userChange',  ex_parm:{user:aobjUser}})
     };
 
     return {   // xxx().then(function(data){}, function(err){})
       userLoginQ: userLoginQ,
+      getAdminColumn:function(){return httpQ(lpUrl,{func:'getAdminColumn',ex_parm:{} })},
+      setAdminColumn:function(aArgs){return httpQ(lpUrl,{func:'setAdminColumn',ex_parm:{columnTree: aArgs } })},
+      getArticleList:function(aColId,aLoc){return httpQ(lpUrl,{func:'getArticleList',ex_parm:{columnId:aColId,location:aLoc} })},
+      getArticleCont:function(aArtId){return httpQ(lpUrl,{func:'getArticleCont',ex_parm:{articleId:aArtId} })},
+      setArticleCont:function(aArtObj){return httpQ(lpUrl,{func:'setArticleCont',ex_parm:{article:aArtObj} })},
+      deleteArticleCont:function(aArtId){return httpQ(lpUrl,{func:'deleteArticleCont',ex_parm:{articleId:aArtId} })},
       checkRtn: checkRtn,
+
       gEvent:{ login:'event:login' }
+
     } ;
 
       /*
@@ -185,7 +185,7 @@ angular.module('blac-util', ['angular-md5'])
       extoolsPromise: function(aParam){ return httpCom('/rest',{ func: 'exTools', ex_parm: aParam })},
       userListGetPromise: function(aParam){ return httpCom('/rest',{ func: 'userListGet', ex_parm: {filter: aParam }})},
       */
-  });   // 业务功能封装
+  })
 ;
 
 
