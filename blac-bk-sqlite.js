@@ -11,24 +11,24 @@ var gdbFile = 'blaccms.db'; // if exist exman.db, means the sql ddl have been ex
 var logInfo = ex.info;
 var logErr = ex.err;
 
-var createDB = function(gdbFile){
-  if (!fs.existsSync(gdbFile)){
+var createDB = function(adbFile){
+  if (!adbFile) adbFile = gdbFile;
+  if (!fs.existsSync(adbFile)){
     logInfo("---no databse file. will create it:---", gdbFile);
     var l_run = [];
-    l_run.push( "CREATE TABLE if not exists USER(NAME NVARCHAR2(32) NOT NULL PRIMARY KEY, " +
-      " WORD CHAR(32) NOT NULL, REM BOOLEAN, MOBILE NVARCHAR2(20), EMAIL NVARCHAR2(80), IDCARD NVARCHAR2(32), " +
-      " UPUSER NVARCHAR2(32), LEVEL INTEGER) WITHOUT ROWID;"   );
-    l_run.push("CREATE INDEX if not exists [idx_user_name] ON [USER] ([NAME] ASC);");
+    l_run.push( "CREATE TABLE if not exists USER(NAME NVARCHAR2(32) NOT NULL PRIMARY KEY,WORD CHAR(32) NOT NULL) WITHOUT ROWID;"   );
 
-    l_run.push("CREATE TABLE if not exists KIND(UUID CHAR(32) NOT NULL PRIMARY KEY, UPKIND CHAR(32),   " +
-      " CONTENT NVARCHAR2(20), COMMENT NVARCHAR2(500), LEVEL INTEGER ) WITHOUT ROWID;");
-    l_run.push("CREATE INDEX if not exists [idx_kind_uuid] ON [KIND] ([UUID] DESC);");
+    l_run.push("CREATE TABLE if not exists COLUMN(ID CHAR(32) NOT NULL PRIMARY KEY, PARENTID CHAR(32),   " +
+      " TITLE NVARCHAR2(200), KIND NVARCHAR2(100), LINK NVARCHAR2(200) ) WITHOUT ROWID;");
 
-    l_run.push("CREATE TABLE if not exists ARTICLE(UUID CHAR(32) NOT NULL PRIMARY KEY, KIND CHAR(32),   " +
-      "IMGLINK NVARCHAR2(1000), VIDEOLINK NVARCHAR2(1000), COMMENT NVARCHAR2(8000) ) WITHOUT ROWID;");
-    l_run.push("CREATE INDEX if not exists [idx_kind_uuid] ON [KIND] ([UUID] DESC);");
+    l_run.push("CREATE TABLE if not exists ARTICLE(ID CHAR(32) NOT NULL PRIMARY KEY, PARENTID CHAR(32) NOT NULL,KIND NVARCHAR2(100)," +
+      "TITLE NVARCHAR2(200),CONTENT NVARCHAR2(10000),VIDEOLINK NVARCHAR2(1000),IMGLINK NVARCHAR2(1000),RECNAME NVARCHAR2(20),RECTIME VARCHAR(20) ) WITHOUT ROWID;");
+    l_run.push("CREATE INDEX if not exists [idx_article_id] ON [ARTICLE] ([ID] DESC);");
+    l_run.push("CREATE INDEX if not exists [idx_article_parentid] ON [ARTICLE] ([PARENTID] DESC);");
 
-    var ldb = new sqlite3.Database(gdbFile);
+    l_run.push("INSERT INTO USER VALUES('admin', '21232f297a57a5a743894a0e4a801fc3'); ");
+
+    var ldb = new sqlite3.Database(adbFile);
     ldb.serialize( function() {
       for (var i in l_run) {
         ldb.run(l_run[i], function (err, row) {
@@ -43,7 +43,7 @@ var createDB = function(gdbFile){
 
 var gdb = new sqlite3.Database(gdbFile);
 
-var genSave = function (aObj, aTable) {    //  列名必须大写。第一字母小写的不生成。 返回sql和 执行参数。
+var genSave = function (aObj, aTable) {    //  _exState用来指示处理。 列名必须大写。第一字母小写的不生成。 返回sql和 执行参数。
   if (!aObj._exState) {
     logInfo("dbsqlite3 genSave get a wrong db object." + aObj);
     return [null, null];
@@ -128,19 +128,18 @@ var getPromise = function (aSql, aParam) {
   var deferred = Q.defer();
   if (aSql.trim().length > 4)  {
     gdb.get(aSql, aParam, function (err, row) {
-      if (err) {if (err) logErr("runSqlPromise",err,aSql,aParam);deferred.reject(err);} else deferred.resolve(row);
+      if (err) {if (err) logErr("getPromise",err,aSql,aParam);deferred.reject(err);} else deferred.resolve(row);
     });
   }
   else deferred.reject("no sql statement ");
   return deferred.promise;
 };
-
 var comSave = function(aTarget, aTable, aCallback) {
-  try {   // ls_sql = dbHelp.genSave(aTarget, aTable);  保存对象到数据库中。
+  try {
     l_gen = genSave(aTarget, aTable);  // 返回一个数组，sql和后续参数。
     logInfo("com save run here with param: ", aTarget, aTable, l_gen);
     gdb.run(l_gen[0], l_gen[1], function (err, row) {
-      row = this.changes;
+      row = this.changes;  // 影响的行。
       aCallback(err, row);
     });
   }
@@ -153,16 +152,16 @@ var comSave = function(aTarget, aTable, aCallback) {
 var helpUser = {
   save:function (aUser, aCallback){ comSave(aUser, 'USER', aCallback); },
   delete : function(aNickName, aCallback){
-    runSql("delete from USER where NICKNAME = ?", aNickName, aCallback); } ,
-  getByNickName:function(aNickName, aCallback) {
-    gdb.get("select * from user where NICKNAME= ?" , aNickName, aCallback);
+    runSql("delete from USER where NAME = ?", aNickName, aCallback); } ,
+  getByName:function(aNickName, aCallback) {
+    gdb.get("select * from user where NAME= ?" , aNickName, aCallback);
   }
 };
-var helpTask = {
-  save: function (aTask, aCallback) {    comSave(aTask, 'TASK', aCallback);  },
-  delete: function (aUUID, aCallBack) {
-    runSql("delete from TASK where UUID = ?", aUUID, aCallBack);  },
-  getByUUID : function (aUUID, aCallback) { gdb.get("select * from task where UUID=?", aUUID, aCallback); },
+var helpColumn = {
+  save: function (aColumn, aCallback) {    comSave(aColumn, 'COLUMN', aCallback);  },
+  delete: function (aID, aCallBack) {
+    runSql("delete from TASK where ID = ?", aID, aCallBack);  },
+  getByID : function (aID, aCallback) { gdb.get("select * from COLUMN where ID=?", aID, aCallback); },
   getChildren: function (rootTask, aCallback) {
     var statckCallback = [];
     function nextTask(aParent, aRow, aI, aCallFin)  // aRow, 是一个数组。aI作为索引。 alen作为结束判断。
@@ -170,7 +169,7 @@ var helpTask = {
       if (aI < aRow.length) {
         aRow[aI].subTask = [];
         aParent.push(aRow[aI]);
-        runSql("SELECT * FROM Task where UPTASK='" + aRow[aI].UUID + "'", function (err, row) {
+        runSql("SELECT * FROM COLUMN where PARENTID='" + aRow[aI].ID + "'", function (err, row) {
           if (row.length > 0) {
             statckCallback.push({a: aParent, b: aRow, c: (aI + 1), d: aCallback });
             nextTask(aRow[aI].subTask, row, 0, aCallback);
@@ -189,7 +188,7 @@ var helpTask = {
         }
       }
     };
-    runSql("SELECT * FROM Task where UPTASK=?", rootTask.UUID, function (err, row) {
+    runSql("SELECT * FROM COLUMN where PARENTID=?", rootTask.ID, function (err, row) {
       rootTask.subTask = [];
       if (row.length > 0) nextTask(rootTask.subTask, row, 0, aCallback); // 就调用一次over。
       else aCallback(null, rootTask);
@@ -198,43 +197,24 @@ var helpTask = {
   }
 
 };
-var helpWork = {
-  save : function (aWORK, aCallback) {  comSave(aWORK, 'WORK', aCallback); },
-  getByUUID : function (aUUID, aCallback) { gdb.get("select * from work where UUID=?", aUUID, aCallback); },
-  delete : function(aUUID, aCallback){ runSql("delete from WORK where UUID = ?", aUUID, aCallback); }
+var helpArticle = {
+  save : function (aArticle, aCallback) {  comSave(aArticle, 'ARTICLE', aCallback); },
+  getByID : function (aID, aCallback) { gdb.get("select * from ARTICLE where ID=?", aID, aCallback); },
+  delete : function(aID, aCallback){ runSql("delete from ARTICLE where ID = ?", aID, aCallback); }
 };
 
-exports.helpTask = helpTask;
 exports.helpUser = helpUser;
-exports.helpWork = helpWork;
+exports.helpColumn = helpColumn;
+exports.helpArticle = helpArticle;
 exports.runSql = runSql;
-exports.run = gdb.run;
-exports.get = gdb.get;
 exports.getPromise = getPromise;
 exports.runSqlPromise = runSqlPromise;
-exports.gdb = gdb;
 exports.genSave = genSave;
-exports.genModel = function(aOpt) {
-  if (aOpt)
-    var ls_pre = "", ls_sep = ":", ls_end = "'',";
-  else
-    var ls_pre = "this.", ls_sep = "=", ls_end = "'';";
-  gdb.get("select * from WORK ", function(err,rtn) {
-    console.log('-------WORK--------');
-    for (var i in rtn) {
-      console.log(ls_pre + i +  ls_sep + rtn[i]  + ls_end);  // 没错误顺便输出对象的数据库属性。
-    }
-    gdb.get("select * from TASK ", function (err, rtn) {
-      console.log('-------TASK--------');
-      for (var i in rtn) {
-        console.log(ls_pre + i +  ls_sep + rtn[i]  + ls_end);  // 没错误顺便输出对象的数据库属性。
-      }
-      console.log('-------USER--------');
-      gdb.get("select * from user ", function (err, rtn) {
-        for (var i in rtn) {
-          console.log(ls_pre + i +  ls_sep + rtn[i]  + ls_end);  // 没错误顺便输出对象的数据库属性。
-        }
-      })
-    })
-  })
-};
+exports.gdb = gdb;
+exports.createDB = createDB;
+
+/*
+test:
+ sqlite = require('./blac-bk-sqlite.js');
+ sqlite.getPromise('select * from user').then(function(data){console.log(data)});
+ */

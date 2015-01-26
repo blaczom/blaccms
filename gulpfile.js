@@ -6,6 +6,9 @@ var gulp = require('gulp');
 // just type: gulp this default will run .
 gulp.task('default', function() {
   // place code for your default task here
+  var sqliteDb = require('./blac-bk-sqlite.js');
+  sqliteDb.createDB();
+
 
 
 });

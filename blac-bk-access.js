@@ -14,75 +14,53 @@ var logErr = ex.err;
 var funcErr = function(err) { logErr(err) };
 
 var objUser = function() {
-  this.NICKNAME = '';
-  this.PASS = '';
-  this.REMPASS = '';
-  this.MOBILE = '';
-  this.EMAIL = '';
-  this.IDCARD = '';
-  this.UPUSER = '';
-  this.LEVEL = '';
-  this.GRANT = '';
-  this.SYNC = '';
+  this.NAME = '';
+  this.WORD = '';
   this._exState = "new";  // new , clean, dirty.
-  this._exDataSet = {};    // 扩展用。日后可以用于前台的数据更新判断. new buffer, old buffer.
 };
 objUser.prototype.new = function(){  return(new objUser()); };
 objUser.prototype.save = gdbLib.helpUser.save;
 objUser.prototype.delete = gdbLib.helpUser.delete;
-objUser.prototype.getByNickName = gdbLib.helpUser.getByNickName;
+objUser.prototype.getByName = gdbLib.helpUser.getByName;
 
-var objTask = function() {
-  this.UUID = '';
-  this.UPTASK = '';
-  this.PLANSTART = '';
-  this.PLANFINISH = '';
-  this.FINISH = '';
-  this.STATE = '';
-  this.OWNER = '';
-  this.OUGHT = '';
-  this.PRIVATE = '';
-  this.CONTENT = '';
-  this.SYNC = '';
+var objColumn = function() {
+  this.ID = '';
+  this.PARENTID = '';
+  this.TITLE = '';
+  this.KIND = '';
+  this.LINK = '';
   this._exState = 'new';
-  this._exDataSet = {};
 };
-objTask.prototype.new  = function(){  return(new objTask()); };
-objTask.prototype.save  = gdbLib.helpTask.save;
-objTask.prototype.delete = gdbLib.helpTask.delete;
-objTask.prototype.getByUUID = gdbLib.helpTask.getByUUID;
-objTask.prototype.getChildren = gdbLib.helpTask.getChildren;
+objColumn.prototype.new  = function(){  return(new objColumn()); };
+objColumn.prototype.save  = gdbLib.helpColumn.save;
+objColumn.prototype.delete = gdbLib.helpColumn.delete;
+objColumn.prototype.getByID = gdbLib.helpColumn.getByID;
+objColumn.prototype.getChildren = gdbLib.helpColumn.getChildren;
 
-var objWork = function() {
-  this.UUID = '';
-  this.UPTASK = '';
-  this.CREATETIME = '';
-  this.LASTMODIFY = '';
-  this.OWNER = '';
-  this.PRIVATE = '';
-  this.LEVEL = '';
+var objArticle = function() {
+  this.ID = '';
+  this.PARENTID = '';
+  this.KIND = '';
+  this.TITLE = '';
   this.CONTENT = '';
-  this.MEMPOINT = '';
-  this.MEMEN = '';
-  this.MEMTIMER = '';
-  this.STATE = '';
-  this.SYNC = '';
+  this.VIDEOLINK = '';
+  this.IMGLINK = '';
+  this.RECNAME = '';
+  this.RECTIME = '';
   this._exState = 'new';
-  this._exDataSet = {};
 };
-objWork.prototype.new = function(){  return(new objWork()); };
-objWork.prototype.save = gdbLib.helpWork.save;
-objWork.prototype.delete = gdbLib.helpWork.delete;
-objWork.prototype.getByUUID = gdbLib.helpWork.getByUUID;
+objArticle.prototype.new = function(){  return(new objArticle()); };
+objArticle.prototype.save = gdbLib.helpArticle.save;
+objArticle.prototype.delete = gdbLib.helpArticle.delete;
+objArticle.prototype.getByID = gdbLib.helpArticle.getByID;
 
 exports.USER = new objUser();
-exports.TASK = new objTask();
-exports.WORK = new objWork();
+exports.COLUMN = new objColumn();
+exports.ARTICLE = new objArticle();
 exports.setDirty = function(aParm) { aParm._exState = 'dirty' };
 exports.setNew = function(aParm) { aParm._exState = 'new' };
 exports.setClean = function(aParm) { aParm._exState = 'clean' };
 exports.runSql = gdbLib.runSql;
 exports.runSqlPromise = gdbLib.runSqlPromise;
-exports.get = gdbLib.gdb.get;
 exports.getPromise = gdbLib.getPromise;
 exports.dbLib = gdbLib;
