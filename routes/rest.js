@@ -7,7 +7,7 @@
  */
 var express = require('express'),
   router = express.Router(),
-//  appDb =  require('../blac-bk-access'),   // 暂时放一下数据库，用grunt来生成。
+  appDb =  require('../blac-bk-access'),
   Q = require('q');
 
 var rtnErr = function(aMsg, aErr) {
@@ -32,7 +32,6 @@ router.post('/', function(req, res) {
   var lFunc = req.body['func']; // 功能名称： 'userlogin' 等等
   var lExparm = req.body['ex_parm'];  // 参数对象: {}
 
-  /* 暂时屏蔽掉没登录的限制。
   if ("userlogin,userReg,exTools,,,".indexOf(lFunc+",") < 0) {   // 需要登录的对象。
     if (!checkLogin(req,res)) {
       var l_rtn = rtnErr('未登录，请先登录。');
@@ -42,34 +41,27 @@ router.post('/', function(req, res) {
       return; // STOP HERE.
     }
   }
-  */
 
   // 正常功能处理：
   switch (lFunc){
     case "userlogin": { // lExparm.user:{name:xx,word:xx}
-      req.session.loginUser = "testOk";
+      /*req.session.loginUser = "testOk";
       req.session.userLevel = 7;
-      res.json(rtnMsg('登录成功。' + "testOk" ));
+      res.json(rtnMsg('登录成功。' + "testOk" )); */
 
-      /* appDb.USER.getByNickName(lExparm.user.name, function (aErr, aRtn) {
+      appDb.USER.getByName(lExparm.user.name, function (aErr, aRtn) {
         if (aErr) res.json(rtnErr(aErr));
         else {
           if (aRtn) {
             if (aRtn.WORD == lExparm.user.word) {
               req.session.loginUser = lExparm.user.name;
-              req.session.userLevel = aRtn.LEVEL;
               res.json(rtnMsg('登录成功。'));
             }
-            else {
-              res.json(rtnErr('密码有误'));
-            }
+            else {     res.json(rtnErr('密码有误'));   }
           }
-          else
-          {
-            res.json(rtnErr('用户不存在'));
-          }
+          else {  res.json(rtnErr('用户不存在'));   }
         }
-      }); */
+      });
       break;
     }
     case "getAdminColumn": {
@@ -82,11 +74,12 @@ router.post('/', function(req, res) {
     }
     case "setAdminColumn": {
       // { func: 'setAdminColumn', ex_parm:{ columnTree: [...] }}
+      // var lfs = require('fs');
+      // var lrtn = lfs.writeFileSync("./routes/treeData.json", lExparm.columnTree);
 
-      var lfs = require('fs');
-      var lrtn = lfs.writeFileSync("./routes/treeData.json", lExparm.columnTree);
 
-      console.log('writefiel', lrtn);
+
+
       res.json( rtnMsg('成功') );
       break;
     }

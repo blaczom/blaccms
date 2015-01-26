@@ -112,5 +112,32 @@ django返回：
 失败：
 {"rtnCode":-1,"rtnInfo":"失败。","alertType":0,"error":[],"exObj":{}}
 ================================================================
+user表的添加、更改：
+{ func: 'setUserCont', ex_parm:{ user: { state:"new", name: xxx , word : xxx, oldWord: xxx} }}
+state说明：
+  new：生成insert，
+  dirty：生成update语句。
+  clean：不用
+---
+user表的删除：
+{ func: 'deleteUserCont',  ex_parm:{ name: xxx } }
+-------------------
+django返回：
+成功：
+{"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{}}
+失败：
+{"rtnCode":-1,"rtnInfo":"失败。","alertType":0,"error":[],"exObj":{}}
 
+--------------
+列出USER栏目下的user列表。
+-------------
+{ func: 'getUserList', ex_parm:{ location: { pageCurrent:当前页, pageRows:一页的行数, pageTotal:共有多少页 } } }
+如果pageTotal是0，就select count(*)，返回rowCount.不然就不用管，返回rowCount:-1。
+----------------
+django返回：
+成功：
+{"rtnCode":1,"rtnInfo":"成功。","alertType":0,"error":[],"exObj":{ rowCount:xxx,  userList: [ {name:xx},...] } }
+失败：
+{"rtnCode":-1,"rtnInfo":"登录不成功。testOk","alertType":0,"error":[],"exObj":{}}
+================================================================
 

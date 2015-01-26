@@ -37,6 +37,7 @@ objColumn.prototype.delete = gdbLib.helpColumn.delete;
 objColumn.prototype.getByID = gdbLib.helpColumn.getByID;
 objColumn.prototype.getChildren = gdbLib.helpColumn.getChildren;
 
+
 var objArticle = function() {
   this.ID = '';
   this.PARENTID = '';

@@ -88,9 +88,9 @@ var genSave = function (aObj, aTable) {    //  _exState用来指示处理。 列
       var lt = [];
       for (i = 0 ; i < l_cols.length; i ++) lt.push(l_cols[i] + "=" + l_quest4vals[i] );
       if ('USER,'.indexOf(aTable.toUpperCase()) >= 0 )
-        ls_sql = "update " + aTable + ' set ' + lt.join(',') + " where NICKNAME = '" + aObj['NICKNAME'] +"'";
+        ls_sql = "update " + aTable + ' set ' + lt.join(',') + " where NAME = '" + aObj['NAME'] +"'";
       else
-        ls_sql = "update " + aTable + ' set ' + lt.join(',') + " where uuid = '" + aObj['UUID'] +"'";
+        ls_sql = "update " + aTable + ' set ' + lt.join(',') + " where id = '" + aObj['ID'] +"'";
       break;
     default : // do nothing.
       ls_sql = "";
@@ -193,9 +193,65 @@ var helpColumn = {
       if (row.length > 0) nextTask(rootTask.subTask, row, 0, aCallback); // 就调用一次over。
       else aCallback(null, rootTask);
     });
+  },
+  syncColumn: function (aRootColomn, aCallBack){
+    var statckCallback = [];
+    var exeSql = [];
+    function nextTask(aParent, aRow, aI)  // aRow, 是一个数组。aI作为索引。 alen作为结束判断。
+    {
+      if (aI < aRow) {
+        switch (aParent[aI].state) {
+          case "clean":
+            break;
+          case "new":
+            exeSql.push(["insert into column(id,parentid,kind,title,link) values(?,?,?,?,?)", aParent[aI] ]);
+            break;
+          case "dirty":
+            exeSql.push(["update column set kind=?,title=?,link=? where id = ?", aParent[aI] ]);
+            break;
+        };
+        if (aParent[aI].items.length > 0) {
+          nextTask(aParent[aI].items, aParent[aI].items.length, 0);
+        }
+        else nextTask(aParent, aRow, ++aI);  //  console.log('没孩子的对象：');;
+      }
+    };
 
+    //"state": "clean",
+    if (aRootColomn.items.length > 0) nextTask(aRootColumn.items, aRootColumn.items.length, 0);
+    logInfo(exeSql);
+
+    var stackSubQ = [];
+    for (var i in row1) { // 对返回的所有数据集进行处理。
+      stackSubQ.push( runSqlPromise( "" ) );
+    }
+
+    Q.all(exeSql).then(function(row2){
+      var l_a = [0,0,0], l_rtn = row2;
+      console.log(row2);
+      for (var i in row2) {
+        if (row2[i].length > 0 ){
+          for (var ii in row2[i]) {
+            var l_rtn = row2[i][ii]
+            switch (l_rtn.STATE) {
+              case '结束':
+                l_a[2] = l_rtn.COUNT;
+                break;
+              case '进行':
+                l_a[1] = l_rtn.COUNT;
+                break;
+              case '计划':
+                l_a[0] = l_rtn.COUNT;
+                break;
+            }
+          }
+          row1[i].subTask = l_a.join('|');
+          console.log(row1[i]);
+        }
+        else   row1[i].subTask = "nochild";
+      }
+    })
   }
-
 };
 var helpArticle = {
   save : function (aArticle, aCallback) {  comSave(aArticle, 'ARTICLE', aCallback); },
