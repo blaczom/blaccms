@@ -89,6 +89,7 @@ angular.module('blac-util', ['angular-md5'])
       md5String: md5.createHash,
       shareCache: { global:{} },
       wrapConfirm : function(aMsg,aObj){if(window.confirm(aMsg))aObj.apply(null, Array.prototype.slice.call(arguments,2) );}
+      // 如果确认，就调用函数：aObj。并把后面的参数传递进去。
     }
   }) // md5加密支持
   .factory('blacStore', function(){
@@ -120,17 +121,83 @@ angular.module('blac-util', ['angular-md5'])
       setLog:function(aObj){return(l_store.setItem('blacStoreStateLog', JSON.stringify(aObj))) ;}
     };
   })   // 本地存储支持
-  .factory('blacAccess', function($location,$http,$q,md5){
-    var lpUrl = '/rest';
+  .factory('blacPage', function(){
+    function psGetContent(aFunGetList,aArgs,aOffset,aCallBack){
+      /* psGetContent(blacAccess.getArticleList,[lLocation, lColumnId, .. ] ,
+      /  通用查询函数：  服务对象的取内容函数，      内容函数的参数：第一个必须是定位对象。
+      /  aoffset, function(aErr,aRtn){lp.contentList=aRtn.content;lp.psContentInfo=aRtn.psInfo })
+      /  偏移量     返回函数。 aRtn里面有2个对象，一个是定位对象，一个是内容列表。
+      */
+      var psInfo = aArgs[0] // 得到定位参数。{ pageCurrent: 1, pageRows: 10, pageTotal: 0  };
+      var lNoNeed = false; // 是否有必要查询。
+      switch (aOffset) {
+        case -1:
+          if (psInfo.pageCurrent > 1) psInfo.pageCurrent = 1; else lNoNeed = true;
+          break;
+        case -2:
+          if (psInfo.pageCurrent > 1) psInfo.pageCurrent -= 1; else lNoNeed = true;
+          break;
+        case -3:
+          if (psInfo.pageCurrent < psInfo.pageTotal) psInfo.pageCurrent += 1; else lNoNeed = true;
+          break;
+        case -4:
+          if (psInfo.pageCurrent < psInfo.pageTotal) psInfo.pageCurrent = psInfo.pageTotal; else lNoNeed = true;
+          break;
+        default :
+          psInfo.pageCurrent = aOffset;
+          break;
+      }
+
+      if (!lNoNeed) {
+        aFunGetList.apply(null, aArgs).then(
+          function (data){
+            if (data.rtnCode == 1) {
+              if (data.exObj.rowCount>0) psInfo.pageTotal = Math.floor(data.exObj.rowCount / psInfo.pageRows ) + 1;
+              aCallBack(null, { content:data.exObj.contentList,
+                                 psInfo: psInfo });
+            }
+            else aCallBack(data.rtnInfo, null);
+          }
+        );
+      }
+    };
+    return {
+      psGetContent:psGetContent
+    }
+  })
+  .factory('blacAccess', function($location,$http,$q,md5,$rootScope){
+    var lpUrl = '/rest/';
+    var gEvent = { login:'event:login', broadcast:'event:broadcast' }
     var httpQ = function(aUrl, aObject){
       var deferred = $q.defer();
-      $http.post(aUrl, aObject)
+      /* $http.post(aUrl, aObject )
         .success(function (data, status, headers, config) {
           deferred.resolve(data || []);
         })
         .error(function (data, status, headers, config) {
           deferred.reject(status);
         });
+      */
+      $rootScope.$broadcast(gEvent.broadcast, "访问服务器...");
+      $.ajax({
+        async: false,
+        crossDomain: false, // obviates need for sameOrigin test
+        type: 'POST',
+        dataType: 'json',
+        url: aUrl,
+        data: {jpargs: JSON.stringify(aObject)},
+        success: function (returnData, returnMsg, ajaxObj, msgShow) {
+          deferred.resolve(returnData || []);
+          var lrtn = "ok";
+          if (returnData.hasOwnProperty('rtnInfo')) lrtn = returnData.rtnInfo;
+            $rootScope.$broadcast(gEvent.broadcast, "访问服务器..." + lrtn);
+        },
+          error: function (xhr, msg, e) {
+            deferred.reject(msg);
+            $rootScope.$broadcast(gEvent.broadcast, "访问服务器错误：" + msg);
+        }
+      });
+
       return deferred.promise;
     };
     var userLoginQ = function(aObjUser) {
@@ -138,7 +205,7 @@ angular.module('blac-util', ['angular-md5'])
       lObjUser.md5 = md5.createHash(lObjUser.name + lObjUser.word);
       delete(lObjUser.word);
       delete(lObjUser.rem);
-      return httpQ(lpUrl, { func: 'userlogin', ex_parm:{ user: lObjUser } }); // user: {name:xx,word:xx}
+      return httpQ(lpUrl, { func: 'userlogin', ex_parm:{ user: lObjUser } } ); // user: {name:xx,word:xx}
     };
     var checkRtn = function (aRtn) {
       if (aRtn.rtnCode == 0)       // 当返回0的时候表示有后续的附加操作。进一步判断appendOper
@@ -150,42 +217,35 @@ angular.module('blac-util', ['angular-md5'])
         };
       return true;
     };
-    var userChange = function(aObjUser){
-      aObjUser.md5 = md5.createHash(aObjUser.name+aObjUser.word) ;
-      aObjUser.oldmd5 = md5.createHash(aObjUser.name+aObjUser.oldword) ;
-      return httpQ(lpUrl, { func: 'userChange',  ex_parm:{user:aobjUser}})
-    };
+    var dataState = { new: "new", dirty: 'dirty', clean: "clean" };
 
     return {   // xxx().then(function(data){}, function(err){})
       userLoginQ: userLoginQ,
+      userChange:function(aUser,aOld,aNew){return httpQ( lpUrl,{func:'userChange',
+        ex_parm:{user:aUser,old:md5.createHash(aUser+aOld), new: md5.createHash(aUser+aNew)}})},
       getAdminColumn:function(){return httpQ(lpUrl,{func:'getAdminColumn',ex_parm:{} })},
       setAdminColumn:function(aArgs){return httpQ(lpUrl,{func:'setAdminColumn',ex_parm:{columnTree: aArgs } })},
-      getArticleList:function(aColId,aLoc){return httpQ(lpUrl,{func:'getArticleList',ex_parm:{columnId:aColId,location:aLoc} })},
+      getArticleList:function(aLoc,aColId){return httpQ(lpUrl,{func:'getArticleList',ex_parm:{columnId:aColId,location:aLoc} })},
       getArticleCont:function(aArtId){return httpQ(lpUrl,{func:'getArticleCont',ex_parm:{articleId:aArtId} })},
       setArticleCont:function(aArtObj){return httpQ(lpUrl,{func:'setArticleCont',ex_parm:{article:aArtObj} })},
       deleteArticleCont:function(aArtId){return httpQ(lpUrl,{func:'deleteArticleCont',ex_parm:{articleId:aArtId} })},
+
+
+      getUserList:function(aLoc){return httpQ(lpUrl,{func:'getUserList',ex_parm:{ location:aLoc } })},
+      setUserCont:function(aUser){return httpQ(lpUrl,{func:'setUserCont',ex_parm:{ user:aUser} })},
+
+      deleteUserCont:function(aName){return httpQ(lpUrl,{func:'deleteUserCont',ex_parm:{name :aName }} ) },
+
+
       checkRtn: checkRtn,
-
-      gEvent:{ login:'event:login' }
-
+      dataState : dataState,
+      setDataState:function(aObj,aState){if($.isArray(aObj)) for(var i=0;i<aObj.length;i++)aObj[i]._exState=aState; else if(aObj) aObj._exState=aState;},
+      getDataState:function(aObj) {return aObj._exState },
+      gEvent:gEvent
     } ;
 
-      /*
-      userChangeQ: userChange,
-      getAllUserQ: function(){return httpCom('/rest',{ func: 'userGetAll', ex_parm: {} })},
-      userGetQ: function() { return httpCom('/rest',{func:'userGet', ex_parm:{userName:exStore.getUser().name}})},
-      taskSaveQ: function(aobjTask){return httpCom('/rest',{ func: 'taskEditSave', ex_parm: { msgObj: aobjTask}})},
-      taskDeleteQ: function(aobjTask) {return httpCom('/rest',{ func: 'taskEditDelete',ex_parm: { msgObj: aobjTask}  })},
-      taskListGetQ: function(aLocate, aFilter) {return httpCom('/rest',{ func: 'taskListGet',ex_parm: { locate: aLocate,filter: aFilter}})},
-      taskGetPromise: function(aUUID) {return httpCom('/rest',{ func: 'taskGet',ex_parm: { UUID:aUUID } } ) },
-      taskExpandPromise : function(aUuid){return  httpCom('/rest',{ func: 'taskAllGet', ex_parm: { taskUUID: aUuid }  })},
-      workSavePromise : function(aobjWork){return httpCom('/rest',{ func: 'workEditSave',  ex_parm: { msgObj: aobjWork} })},
-      workDeletePromise: function(aobjWork){return httpCom('/rest',{func:'workEditDelete',ex_parm:{msgObj:aobjWork}})},
-      workGetPromise: function(aLocate, aFilter){ return httpCom('/rest',{ func: 'workListGet', ex_parm:{locate:aLocate,filter: aFilter}})},
-      extoolsPromise: function(aParam){ return httpCom('/rest',{ func: 'exTools', ex_parm: aParam })},
-      userListGetPromise: function(aParam){ return httpCom('/rest',{ func: 'userListGet', ex_parm: {filter: aParam }})},
-      */
   })
+
 ;
 
 
